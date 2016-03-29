@@ -3,6 +3,7 @@ from cartographer.permissions.base_mask import BaseMask
 from cartographer.resources import get_resource_registry
 from cartographer.resources.resource_registry import ResourceRegistryKeys
 from cartographer.serializers import JSONAPISerializer
+from cartographer.utils import config
 
 
 class SchemaSerializer(JSONAPISerializer):
@@ -50,9 +51,8 @@ class SchemaSerializer(JSONAPISerializer):
                 includes = [include_path[len(prefix):]
                             for include_path in parent_resource.includes
                             if include_path.startswith(prefix)]
-                # TODO: kill this query param check in favor of .null appending
-                if len(includes) == 0 \
-                        and (not request or request.args.get('use-defaults-for-included-resources') != 'false'):
+                if len(includes) == 0:
+                    # TODO: kill all uses of request.args.get('use-defaults-for-included-resources') in clients
                     includes = type(self).default_includes()
             else:
                 if inbound_request:
@@ -116,7 +116,7 @@ class SchemaSerializer(JSONAPISerializer):
     def resource_url(self):
         if self.route_prefix():
             return "https://{server}/{route}/{id}".format(
-                server=patreon.config.api_server,
+                server=config.api_server,
                 route=self.route_prefix(),
                 id=self.resource_id_str()
             )

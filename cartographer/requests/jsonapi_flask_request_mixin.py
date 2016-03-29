@@ -3,7 +3,7 @@ import json
 from cartographer.exceptions.request_exceptions import DataMissing, BadPageCountParameter, BadPageCursorParameter, \
     BadPageOffsetParameter
 from cartographer.requests.jsonapi_request_interface import JSONAPIRequestInterface
-from cartographer.utils.version import JSONAPIVersion, JSONAPI_DEFAULT_VERSION
+from cartographer.utils.version import JSONAPIVersion, get_default_version
 
 
 class JSONAPIFlaskRequestMixin(JSONAPIRequestInterface):
@@ -16,7 +16,7 @@ class JSONAPIFlaskRequestMixin(JSONAPIRequestInterface):
         else:
             raise DataMissing()
         # TODO: have get_data clients expect attributes to be nested
-        if self.get_json_api_version() == JSONAPIVersion.JSON_API_1_0:
+        if self.get_json_api_version() == JSONAPIVersion.JSONAPI_1_0:
             data.update(data.get('attributes', {}))
         return data
 
@@ -77,8 +77,7 @@ class JSONAPIFlaskRequestMixin(JSONAPIRequestInterface):
         return [
             resource
             for resource in included
-            if resource.get('type') == type_
-            and (id_ is None or id_ == resource.get('id'))
+            if resource.get('type') == type_ and (id_ is None or id_ == resource.get('id'))
         ]
 
     def get_filters(self):
@@ -92,5 +91,5 @@ class JSONAPIFlaskRequestMixin(JSONAPIRequestInterface):
 
     def get_json_api_version(self, default_version=None):
         if default_version is None:
-            default_version = JSONAPI_DEFAULT_VERSION
-        return self.args.get('json-api-version', default_version)
+            default_version = get_default_version()
+        return JSONAPIVersion(self.args.get('json-api-version', default_version))

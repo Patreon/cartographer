@@ -4,4 +4,5 @@ _resource_registry = ResourceRegistry()
 
 
 def get_resource_registry(registry=_resource_registry):
-    return registry
+    registry.call_initialization_hook()
+    return registry.registry

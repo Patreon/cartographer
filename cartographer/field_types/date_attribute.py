@@ -1,9 +1,9 @@
 import ciso8601
 
 import dateutil.parser
-from patreon.util.datetime import as_utc, make_naive
 
 from cartographer.field_types import SchemaAttribute
+from cartographer.utils.datetime import as_utc, make_naive
 
 
 class DateAttribute(SchemaAttribute):

@@ -1,6 +1,6 @@
 from cartographer.parsers.jsonapi_parser import PostedDocument
 from cartographer.field_types import ArrayRelationship
-from cartographer.utils.version import JSONAPI_DEFAULT_VERSION
+from cartographer.utils.version import get_default_version
 
 
 class SchemaParser(PostedDocument):
@@ -38,7 +38,7 @@ class SchemaParser(PostedDocument):
             if inbound_request:
                 version = inbound_request.get_json_api_version()
             else:
-                version = JSONAPI_DEFAULT_VERSION
+                version = get_default_version()
         if json_data is None and inbound_request:
             json_data = inbound_request.get_json(force=True)
         super().__init__(json_data=json_data, version=version)

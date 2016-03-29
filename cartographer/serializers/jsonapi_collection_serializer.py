@@ -75,12 +75,12 @@ class JSONAPICollectionSerializer(JSONAPISerializer):
 
     def as_link_json(self, version):
         # if we drop RC2, then this override will probably go away
-        if version == JSONAPIVersion.JSON_API_RC2:
+        if version == JSONAPIVersion.JSONAPI_RC2:
             return self.as_link_json_rc2(version)
-        elif version == JSONAPIVersion.JSON_API_RC3 or version == JSONAPIVersion.JSON_API_1_0:
-            key = 'data' if version == JSONAPIVersion.JSON_API_1_0 else 'linkage'
+        elif version == JSONAPIVersion.JSONAPI_RC3 or version == JSONAPIVersion.JSONAPI_1_0:
+            key = 'data' if version == JSONAPIVersion.JSONAPI_1_0 else 'linkage'
             link_json = {key: self.as_linkage_json()}
-            if version == JSONAPIVersion.JSON_API_1_0:
+            if version == JSONAPIVersion.JSONAPI_1_0:
                 link_json['links'] = self.relationship_urls_json(version)
             else:
                 link_json.update(self.relationship_urls_json(version))

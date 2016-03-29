@@ -1,6 +1,7 @@
+import importlib
 from collections import deque
 
-from cartographer.utils.version import JSONAPI_DEFAULT_VERSION, JSONAPIVersion
+from cartographer.utils.version import get_default_version, JSONAPIVersion
 
 
 class JSONAPISerializer(object):
@@ -30,12 +31,10 @@ class JSONAPISerializer(object):
     # internal usage
 
     def as_json_api_document(self, version=None):
-        # TODO: remove this hack once versions are stabilized
         if version is None:
-            if request:
-                version = request.get_json_api_version()
-            else:
-                version = JSONAPI_DEFAULT_VERSION
+            version = self._flask_json_api_version()
+        if version is None:
+            version = get_default_version()
         return self.document_with_data(self.as_json_api_data(version), version)
 
     def resource_id_str(self):
@@ -123,9 +122,9 @@ class JSONAPISerializer(object):
         if self.relationship_url():
             relationship_urls_json["self"] = self.relationship_url()
         if self.resource_url():
-            if version == JSONAPIVersion.JSON_API_RC2:
+            if version == JSONAPIVersion.JSONAPI_RC2:
                 relationship_urls_json["resource"] = self.resource_url()
-            elif version == JSONAPIVersion.JSON_API_RC3 or version == JSONAPIVersion.JSON_API_1_0:
+            elif version == JSONAPIVersion.JSONAPI_RC3 or version == JSONAPIVersion.JSONAPI_1_0:
                 relationship_urls_json["related"] = self.resource_url()
             else:
                 raise ValueError("Unknown JSON API version")
@@ -134,11 +133,11 @@ class JSONAPISerializer(object):
     def as_link_json(self, version):
         link_json = {}
 
-        if version == JSONAPIVersion.JSON_API_RC2:
+        if version == JSONAPIVersion.JSONAPI_RC2:
             link_json.update(self.as_linkage_json())
-        elif version == JSONAPIVersion.JSON_API_RC3:
+        elif version == JSONAPIVersion.JSONAPI_RC3:
             link_json["linkage"] = self.as_linkage_json()
-        elif version == JSONAPIVersion.JSON_API_1_0:
+        elif version == JSONAPIVersion.JSONAPI_1_0:
             link_json["data"] = self.as_linkage_json()
         else:
             raise ValueError("Unknown JSON API version")
@@ -151,7 +150,7 @@ class JSONAPISerializer(object):
         return link_json
 
     def as_json_api_data(self, version):
-        if version == JSONAPIVersion.JSON_API_1_0:
+        if version == JSONAPIVersion.JSONAPI_1_0:
             attributes = self.as_json()
             if 'id' in attributes:
                 del attributes['id']
@@ -162,7 +161,7 @@ class JSONAPISerializer(object):
         json["type"] = self.resource_type()
         links = self.resource_links_json(version)
         if links:
-            if version == JSONAPIVersion.JSON_API_1_0:
+            if version == JSONAPIVersion.JSONAPI_1_0:
                 json["relationships"] = links
             else:
                 json["links"] = links
@@ -195,20 +194,18 @@ class JSONAPISerializer(object):
         return links
 
     def included_resources_key(self, version):
-        if version == JSONAPIVersion.JSON_API_RC2:
+        if version == JSONAPIVersion.JSONAPI_RC2:
             return "linked"
-        elif version == JSONAPIVersion.JSON_API_RC3 or version == JSONAPIVersion.JSON_API_1_0:
+        elif version == JSONAPIVersion.JSONAPI_RC3 or version == JSONAPIVersion.JSONAPI_1_0:
             return "included"
         else:
             raise ValueError("Unknown JSON API version")
 
     def as_json_api_relationship_document(self, version=None):
-        # TODO: remove this hack once versions are stabilized
         if version is None:
-            if request:
-                version = request.get_json_api_version()
-            else:
-                version = JSONAPI_DEFAULT_VERSION
+            version = self._flask_json_api_version()
+        if version is None:
+            version = get_default_version()
         return self.document_with_data(self.as_linkage_json(), version, False)
 
     def document_with_data(self, data, version, skip_self=True):
@@ -223,3 +220,17 @@ class JSONAPISerializer(object):
         if meta is not None:
             response["meta"] = meta
         return response
+
+    # flask request context
+
+    @staticmethod
+    def _has_flask_request_context():
+        return importlib.util.find_spec("flask") is not None
+
+    @staticmethod
+    def _flask_json_api_version():
+        if JSONAPISerializer._has_flask_request_context():
+            from flask import request
+            if request:
+                return request.get_json_api_version()
+        return None

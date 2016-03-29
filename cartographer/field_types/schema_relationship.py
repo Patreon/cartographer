@@ -1,6 +1,5 @@
 from cartographer.resources import get_resource_registry
 from cartographer.resources.resource_registry import ResourceRegistryKeys
-from cartographer.serializers import JSONAPINullSerializer
 
 
 class SchemaRelationship(object):
@@ -55,7 +54,7 @@ class SchemaRelationship(object):
 
         model = None
         if self.id_attribute is not None:
-            relationship_model_class = self.resource_registry_entry().model
+            relationship_model_class = self.resource_registry_entry().get(ResourceRegistryKeys.MODEL)
             model_id = getattr(parent_resource.model, self.id_attribute)
             if model_id is not None:
                 model = relationship_model_class.get(model_id)
@@ -73,7 +72,8 @@ class SchemaRelationship(object):
                 includes=self.includes
             )
         else:
+            from cartographer.serializers import JSONAPINullSerializer
             return JSONAPINullSerializer()
 
     def resource_registry_entry(self):
-        return get_resource_registry().get(self.model_type)
+        return get_resource_registry().get(self.model_type, {})

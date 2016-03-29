@@ -1,6 +1,6 @@
 import itertools
 
-from cartographer.utils.version import JSONAPI_DEFAULT_VERSION
+from cartographer.utils.version import get_default_version
 
 
 class PostedDocument(object):
@@ -9,7 +9,7 @@ class PostedDocument(object):
         self.json_data = json_data
 
         if version is None:
-            version = JSONAPI_DEFAULT_VERSION
+            version = get_default_version()
         self.version = version
 
     def data(self):
