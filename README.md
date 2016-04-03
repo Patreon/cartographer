@@ -202,6 +202,4 @@ TODO:
 -----
 * make example (generic_social_network)
 * check that the resource_registry strategy works
-* more hidden gotchas. i.e. .get.prime in schema_serializer isnt yet complaining, but we definitely don't have anything re: multigets yet
 * pull over tests
-* port `patreon_py` over to using this library via `pip`
