@@ -31,10 +31,7 @@ class JSONAPISerializer(object):
     # internal usage
 
     def as_json_api_document(self, version=None):
-        if version is None:
-            version = self._flask_json_api_version()
-        if version is None:
-            version = get_default_version()
+        version = self._get_version(version)
         return self.document_with_data(self.as_json_api_data(version), version)
 
     def resource_id_str(self):
@@ -202,10 +199,7 @@ class JSONAPISerializer(object):
             raise ValueError("Unknown JSON API version")
 
     def as_json_api_relationship_document(self, version=None):
-        if version is None:
-            version = self._flask_json_api_version()
-        if version is None:
-            version = get_default_version()
+        version = self._get_version(version)
         return self.document_with_data(self.as_linkage_json(), version, False)
 
     def document_with_data(self, data, version, skip_self=True):
@@ -220,6 +214,13 @@ class JSONAPISerializer(object):
         if meta is not None:
             response["meta"] = meta
         return response
+
+    def _get_version(self, version=None):
+        if version is None:
+            version = self._flask_json_api_version()
+            if version is None:
+                version = get_default_version()
+        return version
 
     # flask request context
 

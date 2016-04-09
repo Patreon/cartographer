@@ -3,6 +3,11 @@ from cartographer.resources.resource_registry import ResourceRegistryKeys
 
 
 class ArrayRelationship(SchemaRelationship):
+    def __init__(self, model_type, model_property=None, model_method=None,
+                 resource_method=None, includes=None):
+        super().__init__(model_type=model_type, model_property=model_property, model_method=model_method,
+                         resource_method=resource_method, includes=includes)
+
     def resource(self, parent_resource, relationship_key):
         from cartographer.serializers import JSONAPICollectionSerializer
 
@@ -11,8 +16,7 @@ class ArrayRelationship(SchemaRelationship):
 
         models = []
         if self.id_attribute is not None:
-            # TODO: 'id' on to-many relations?
-            models = []
+            raise Exception("id_attribute provided for an ArrayRelationship.")
         elif self.model_property is not None:
             models = getattr(parent_resource.model, self.model_property)
         elif self.model_method is not None:

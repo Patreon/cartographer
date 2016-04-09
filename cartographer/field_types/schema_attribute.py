@@ -35,10 +35,11 @@ class SchemaAttribute(object):
         self.is_property = is_property
         self.resource_method = resource_method
 
-    def value(self, resource):
+    def to_json(self, resource):
         """
         :param resource: The resource which is currently responsible for serializing this value
-        :return: The raw value to be serialized, which will be formatted via format_value
+        :return: The value which the json library can serialize,
+        which will have been formatted via format_value_for_json
         """
         value = None
         if self.model_attribute:
@@ -49,12 +50,12 @@ class SchemaAttribute(object):
             value = getattr(resource, self.resource_method)()
 
         if value is not None:
-            value = self.format_value(value)
+            value = self.format_value_for_json(value)
 
         return value
 
     @classmethod
-    def format_value(cls, value):
+    def format_value_for_json(cls, value):
         """
         :param value: The raw value, almost always the output of self.value
         :return: The formatted value, which can be dropped into a Python dictionary as the output of this Resource,

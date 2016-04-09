@@ -26,7 +26,7 @@ class JSONAPIFlaskRequestMixin(JSONAPIRequestInterface):
     def get_pagination(self, page_count_default=10, cursor_formatter=None):
         per_page = self.args.get('page[count]')
         if per_page is not None:
-            if not (isinstance(per_page, str) and per_page == 'infinity'):
+            if per_page != 'infinity':
                 try:
                     per_page = int(per_page)
                 except TypeError:
