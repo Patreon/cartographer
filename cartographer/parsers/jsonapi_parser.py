@@ -19,11 +19,10 @@ class PostedDocument(object):
             return PostedResource(self.json_data["data"], self)
 
     def all_resource_json_data(self):
-        resources = []
-        if isinstance(self.json_data["data"], list):
-            resources = itertools.chain(resources, self.json_data["data"])
-        else:
-            resources = itertools.chain(resources, [self.json_data["data"]])
+        data = self.json_data["data"]
+        if not isinstance(data, list):
+            data = [data]
+        resources = itertools.chain([], data)
 
         if "included" in self.json_data:
             resources = itertools.chain(resources, self.json_data["included"])
@@ -65,17 +64,11 @@ class PostedResource(object):
 
     def relationship_id(self, relationship_name):
         relationship = self.relationship(relationship_name)
-        if relationship:
-            return relationship.relationship_id()
-        else:
-            return None
+        return relationship.relationship_id() if relationship else None
 
     def related_resource(self, relationship_name):
         relationship = self.relationship(relationship_name)
-        if relationship:
-            return relationship.resource()
-        else:
-            return None
+        return relationship.resource() if relationship else None
 
 
 class PostedRelationship(object):

@@ -43,9 +43,8 @@ class SchemaParser(PostedDocument):
             json_data = inbound_request.get_json(force=True)
         super().__init__(json_data=json_data, version=version)
 
-        if parent_resource:
-            if not current_user_id:
-                current_user_id = parent_resource.current_user_id
+        if parent_resource and not current_user_id:
+            current_user_id = parent_resource.current_user_id
 
         if current_user_id is None and inbound_session:
             current_user_id = inbound_session.user_id
@@ -141,9 +140,8 @@ class SchemaParser(PostedDocument):
                     {'id': x.resource_id()}
                     for x in self.data().relationship_id(key)
                 ]
-            else:
-                if schema_relationship.id_attribute:
-                    return schema_relationship.id_attribute, self.data().relationship_id(key).resource_id()
+            elif schema_relationship.id_attribute:
+                return schema_relationship.id_attribute, self.data().relationship_id(key).resource_id()
         return None
         # TODO: let SchemaRelationship declare parser_method
 

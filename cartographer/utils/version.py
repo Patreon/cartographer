@@ -7,9 +7,14 @@ class JSONAPIVersion(Enum):
     JSONAPI_1_0 = "1.0"
 
 
-JSONAPI_VALID_VERSIONS = [JSONAPIVersion.JSONAPI_RC2, JSONAPIVersion.JSONAPI_RC3, JSONAPIVersion.JSONAPI_1_0]
-JSONAPI_DEFAULT_VERSION = JSONAPIVersion.JSONAPI_1_0
+JSONAPI_VALID_VERSIONS = [version for version in JSONAPIVersion]
+_JSONAPI_DEFAULT_VERSION = JSONAPIVersion.JSONAPI_1_0
 
 
 def get_default_version():
-    return JSONAPI_DEFAULT_VERSION
+    return _JSONAPI_DEFAULT_VERSION
+
+
+def set_default_version(version):
+    global _JSONAPI_DEFAULT_VERSION
+    _JSONAPI_DEFAULT_VERSION = version
