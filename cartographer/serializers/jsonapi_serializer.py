@@ -216,11 +216,7 @@ class JSONAPISerializer(object):
         return response
 
     def _get_version(self, version=None):
-        if version is None:
-            version = self._flask_json_api_version()
-            if version is None:
-                version = get_default_version()
-        return version
+        return version or self._flask_json_api_version() or get_default_version()
 
     # flask request context
 

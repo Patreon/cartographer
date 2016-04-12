@@ -12,7 +12,6 @@ _JSONAPI_DEFAULT_VERSION = JSONAPIVersion.JSONAPI_1_0
 
 
 def get_default_version():
-    global _JSONAPI_DEFAULT_VERSION
     return _JSONAPI_DEFAULT_VERSION
 
 
