@@ -107,7 +107,7 @@ class SchemaSerializer(JSONAPISerializer):
         return cls.schema().resource_type()
 
     def resource_id(self):
-        return self.schema().resource_id().format_value_for_json(self)
+        return self.schema().resource_id().to_json(self)
 
     @classmethod
     def route_prefix(cls):
@@ -211,7 +211,7 @@ class SchemaSerializer(JSONAPISerializer):
             for key in attribute_keys:
                 if self.should_include_attribute(key):
                     attribute = self.schema().attribute(key)
-                    result[key] = attribute.format_value_for_json(self)
+                    result[key] = attribute.to_json(self)
         return result
 
     def should_include_attribute(self, key):
