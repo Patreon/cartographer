@@ -10,7 +10,7 @@ class SchemaSerializer(JSONAPISerializer):
     """
     SchemaSerializer turns python models into JSON API responses.
     It does so by subclassing `JSONAPISerializer`, and implementing its main four methods --
-    `resource_id`, `resource_type`, `as_json`, and `linked_resources` --
+    `resource_id`, `resource_type`, `attributes_dictionary`, and `linked_resources` --
     using the passed-in model and the associated `schema`.
     """
 
@@ -199,7 +199,7 @@ class SchemaSerializer(JSONAPISerializer):
 
     # Attributes
 
-    def as_json(self):
+    def attributes_dictionary(self):
         """
         The primary entry point for serialization of attributes
 

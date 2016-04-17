@@ -101,7 +101,7 @@ To understand `SchemaSerializer`, one must first understand its superclass `JSON
 one for each of the top-level keys in a JSON API resource:
 * `resource_id`, to provide the `id` field
 * `resource_type`, to provide the `type` field
-* `as_json`, to provide the `attributes` fields
+* `attributes_dictionary`, to provide the `attributes` fields
 * `linked_resources`, to provide the `relationships` fields
 
 Overriding and implementing these four methods in a subclass of `JSONAPISerializer`
