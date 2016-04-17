@@ -11,20 +11,20 @@ class SchemaAttribute(object):
     """
 
     def __init__(self, model_attribute=None, is_property=True,
-                 resource_method=None):
+                 serializer_method=None):
         """
-        Note: only one of model_attribute and resource_method should be provided.
-        Note: is_property is not relevant for resource_method
+        Note: only one of model_attribute and serializer_method should be provided.
+        Note: is_property is not relevant for serializer_method
 
         :param model_attribute: the name of the attribute on the python model that should be (de)serialized
         :param is_property: whether or not model_attribute is a property (if False, it is presumed it is a method)
-        :param resource_method: the name of the method on the resource object which uses this schema
+        :param serializer_method: the name of the method on the serializer object which uses this schema
         which should be called to get the serialized value.
         :return: an instance of SchemaAttribute,
-        which will later be used by a Parser or Resource to move between JSON API and Python
+        which will later be used by a Parser or Serializer to move between JSON API and Python
         """
 
-        identifier_args = [model_attribute, resource_method]
+        identifier_args = [model_attribute, serializer_method]
         provided_identifiers = [identifier
                                 for identifier in identifier_args
                                 if identifier]
@@ -33,21 +33,21 @@ class SchemaAttribute(object):
 
         self.model_attribute = model_attribute
         self.is_property = is_property
-        self.resource_method = resource_method
+        self.serializer_method = serializer_method
 
-    def to_json(self, resource):
+    def to_json(self, serializer):
         """
-        :param resource: The resource which is currently responsible for serializing this value
+        :param serializer: The serializer which is currently responsible for serializing this value
         :return: The value which the json library can serialize,
         which will have been formatted via format_value_for_json
         """
         value = None
         if self.model_attribute:
-            value = getattr(resource.model, self.model_attribute)
+            value = getattr(serializer.model, self.model_attribute)
             if not self.is_property:
                 value = value()
-        elif self.resource_method:
-            value = getattr(resource, self.resource_method)()
+        elif self.serializer_method:
+            value = getattr(serializer, self.serializer_method)()
 
         if value is not None:
             value = self.format_value_for_json(value)
@@ -58,7 +58,7 @@ class SchemaAttribute(object):
     def format_value_for_json(cls, value):
         """
         :param value: The raw value, almost always the output of self.value
-        :return: The formatted value, which can be dropped into a Python dictionary as the output of this Resource,
+        :return: The formatted value, which can be dropped into a Python dictionary as the output of this Serializer,
         typically which will have json.dumps called on it to return to a client
         """
         return value

@@ -7,7 +7,7 @@ class SchemaRelationship(object):
     `SchemaRelationship` describes how to translate related resources to and from JSON API and our Python models.
 
     `SchemaRelationship` is has one primary method,
-    `resource`, for creating a `JSONAPISerializer` instance based on its input arguments.
+    `related_serializer`, for creating a `JSONAPISerializer` instance based on its input arguments.
     Subclasses of `SchemaSerializer` can override this method
     to customize serialization behavior.
     Parsing of related resources is not currently handled by this class,
@@ -15,21 +15,21 @@ class SchemaRelationship(object):
     """
 
     def __init__(self, model_type, id_attribute=None, model_property=None,
-                 model_method=None, resource_method=None, includes=None):
+                 model_method=None, serializer_method=None, includes=None):
         """
-        NOTE: only one of id_attribute, model_property, model_method, or resource_method should be provided
+        NOTE: only one of id_attribute, model_property, model_method, or serializer_method should be provided
 
         :param model_type: the JSON API `type` string for the related model
-        :param id_attribute: the foreign key column on the parent resource model which identifies the related resource
-        :param model_property: the property on the parent resource model which returns the related resource
-        :param model_method: the property on the parent resource model which returns the related resource
-        :param resource_method: the name of the method on the parent resource object which uses this schema
-        which should be called to get the serializable child resource.
+        :param id_attribute: the foreign key column on the parent serializer model which identifies the related serializer
+        :param model_property: the property on the parent serializer model which returns the related serializer
+        :param model_method: the property on the parent serializer model which returns the related serializer
+        :param serializer_method: the name of the method on the parent serializer object which uses this schema
+        which should be called to get the child serializer.
         :return: an instance of SchemaRelationship,
         which will later be used to serialize Python into JSON API.
         """
 
-        identifier_args = [id_attribute, model_property, model_method, resource_method]
+        identifier_args = [id_attribute, model_property, model_method, serializer_method]
         provided_identifiers = [identifier
                                 for identifier in identifier_args
                                 if identifier]
@@ -40,34 +40,34 @@ class SchemaRelationship(object):
         self.id_attribute = id_attribute
         self.model_property = model_property
         self.model_method = model_method
-        self.resource_method = resource_method
+        self.serializer_method = serializer_method
         self.includes = includes
 
-    def resource(self, parent_resource, relationship_key):
+    def related_serializer(self, parent_serializer, relationship_key):
         """
-        :param parent_resource: The resource which has our return value as a related resource
-        :param relationship_key: The name by which the parent resource knows this child resource
-        :return: The child resource (or resource collection) which will later be serialized
+        :param parent_serializer: The serializer which has our return value as a related resource
+        :param relationship_key: The name by which the parent serializer knows this child
+        :return: The child serializer which will later be used to serialize a related resource
         """
-        if self.resource_method is not None:
-            return getattr(parent_resource, self.resource_method)()
+        if self.serializer_method is not None:
+            return getattr(parent_serializer, self.serializer_method)()
 
         model = None
         if self.id_attribute is not None:
             relationship_model_class = self.resource_registry_entry().get(ResourceRegistryKeys.MODEL)
-            model_id = getattr(parent_resource.model, self.id_attribute)
+            model_id = getattr(parent_serializer.model, self.id_attribute)
             if model_id is not None:
                 model = relationship_model_class.get(model_id)
         elif self.model_property is not None:
-            model = getattr(parent_resource.model, self.model_property)
+            model = getattr(parent_serializer.model, self.model_property)
         elif self.model_method is not None:
-            model = getattr(parent_resource.model, self.model_method)()
+            model = getattr(parent_serializer.model, self.model_method)()
 
         if model:
-            relationship_resource_class = self.resource_registry_entry().get(ResourceRegistryKeys.SERIALIZER)
-            return relationship_resource_class(
+            serializer_class = self.resource_registry_entry().get(ResourceRegistryKeys.SERIALIZER)
+            return serializer_class(
                 model,
-                parent_resource=parent_resource,
+                parent_serializer=parent_serializer,
                 relationship_name=relationship_key,
                 includes=self.includes
             )
