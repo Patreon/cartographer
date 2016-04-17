@@ -1,4 +1,5 @@
 import json
+import re
 
 from cartographer.exceptions.request_exceptions import DataMissing, BadPageCountParameter, BadPageCursorParameter, \
     BadPageOffsetParameter
@@ -93,3 +94,35 @@ class JSONAPIFlaskRequestMixin(JSONAPIRequestInterface):
         if default_version is None:
             default_version = get_default_version()
         return JSONAPIVersion(self.args.get('json-api-version', default_version))
+
+    def dictionary_from_get(self, outer_key):
+        return self.__parse_parameters_to_dictionary(self.args).get(outer_key, {})
+
+    @staticmethod
+    def __parse_parameters_to_dictionary(params):
+        pattern = re.compile('([^\[\]]+)\[(.*)\]')
+        return_dict = {}
+
+        for key in params.keys():
+            match_data = pattern.fullmatch(key)
+            if not match_data:
+                continue
+
+            match_groups = match_data.groups()
+            if len(match_groups) != 2:
+                continue
+
+            prefix = match_groups[0]
+            path = match_groups[1].split('][')
+            result_for_prefix = return_dict.get(prefix, {})
+            current_result = result_for_prefix
+            for index, step in enumerate(path):
+                if index == len(path) - 1:
+                    current_result[step] = params[key]
+                else:
+                    if step not in current_result:
+                        current_result[step] = {}
+                    current_result = current_result[step]
+            return_dict[prefix] = result_for_prefix
+
+        return return_dict
