@@ -16,18 +16,18 @@ class SchemaSerializer(JSONAPISerializer):
 
     def __init__(self, model,
                  inbound_request=None, inbound_session=None,
-                 parent_resource=None, relationship_name=None,
+                 parent_serializer=None, relationship_name=None,
                  includes=None, requested_fields=None,
                  current_user_id=None):
         """
         Route files should pass in `inbound_request` and `inbound_session`,
-        Resource files should pass in `parent_resource` and `relationship_name`
+        Resource files should pass in `parent_serializer` and `relationship_name`
 
         :param model: The model which will be serialized into JSON
         :param inbound_request: The current `JSONAPIRequest` which is prompting the creation of this resource
         :param inbound_session: The `JSONAPISession` which is active during the creation of this resource
-        :param parent_resource: The `JSONAPISerializer` which is creating this instance as one of its `linked_resources`
-        :param relationship_name: The name by which the parent_resource refers to this instance
+        :param parent_serializer: The `JSONAPISerializer` which is creating this instance as one of its `linked_resources`
+        :param relationship_name: The name by which the parent_serializer refers to this instance
         :param includes: An array of strings, representing the relationships which should be serialized
         :param requested_fields: A map from strings to arrays of strings,
             representing the resource types and their associated attributes which should be serialized
@@ -39,17 +39,17 @@ class SchemaSerializer(JSONAPISerializer):
 
         self.model = model
 
-        if parent_resource:
+        if parent_serializer:
             if not requested_fields:
-                requested_fields = parent_resource.requested_fields
+                requested_fields = parent_serializer.requested_fields
             if not current_user_id:
-                current_user_id = parent_resource.current_user_id
+                current_user_id = parent_serializer.current_user_id
 
         if includes is None:
-            if parent_resource is not None and relationship_name is not None:
+            if parent_serializer is not None and relationship_name is not None:
                 prefix = relationship_name + '.'
                 includes = [include_path[len(prefix):]
-                            for include_path in parent_resource.includes
+                            for include_path in parent_serializer.includes
                             if include_path.startswith(prefix)]
                 if len(includes) == 0:
                     # TODO: kill all uses of request.args.get('use-defaults-for-included-resources') in clients
@@ -139,7 +139,7 @@ class SchemaSerializer(JSONAPISerializer):
                 for key in relationship_keys:
                     if self.should_include_relationship(key):
                         relationship = self.schema().relationship(key)
-                        links[key] = relationship.resource(self, key)
+                        links[key] = relationship.related_serializer(self, key)
             self._linked_resources = links
         return self._linked_resources
 
