@@ -6,3 +6,6 @@ __pycache__
 /venv/
 /.idea/
 .DS_Store
+/example/venv/
+/example/.idea/
+/example/*.db
