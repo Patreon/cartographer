@@ -81,7 +81,9 @@ class JSONAPICollectionSerializer(JSONAPISerializer):
             key = 'data' if version == JSONAPIVersion.JSONAPI_1_0 else 'linkage'
             link_json = {key: self.as_linkage_json()}
             if version == JSONAPIVersion.JSONAPI_1_0:
-                link_json['links'] = self.relationship_urls_json(version)
+                links = self.relationship_urls_json(version)
+                if links:
+                    link_json['links'] = links
             else:
                 link_json.update(self.relationship_urls_json(version))
             meta = self.meta()

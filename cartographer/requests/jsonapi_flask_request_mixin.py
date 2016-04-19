@@ -96,10 +96,10 @@ class JSONAPIFlaskRequestMixin(JSONAPIRequestInterface):
         return JSONAPIVersion(self.args.get('json-api-version', default_version))
 
     def dictionary_from_get(self, outer_key):
-        return self.__parse_parameters_to_dictionary(self.args).get(outer_key, {})
+        return self._parse_parameters_to_dictionary(self.args).get(outer_key, {})
 
     @staticmethod
-    def __parse_parameters_to_dictionary(params):
+    def _parse_parameters_to_dictionary(params):
         pattern = re.compile('([^\[\]]+)\[(.*)\]')
         return_dict = {}
 
