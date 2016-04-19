@@ -28,7 +28,3 @@ def json_error_description(error_):
 
 for error in list(range(400, 420)) + list(range(500, 506)):
     my_app.error_handler_spec[None][error] = json_error_description
-
-
-# db_wrapper.build_if_needed(db)
-# db_wrapper.reset(db)

@@ -9,7 +9,7 @@ from generic_social_network.app.models.tables.user_read_history import UserReadH
 class UserReadHistorySchema(Schema):
     SCHEMA = {
         'type': 'user-read-history',
-        'id': StringAttribute(resource_method='user_read_history_id'),
+        'id': StringAttribute(serializer_method='user_read_history_id'),
         'attributes': {
             'timestamp': DateAttribute('timestamp')
         },

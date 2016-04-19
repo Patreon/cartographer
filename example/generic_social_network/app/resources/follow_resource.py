@@ -9,7 +9,7 @@ from generic_social_network.app.models.tables.follow import Follow
 class FollowSchema(Schema):
     SCHEMA = {
         'type': 'follow',
-        'id': StringAttribute(resource_method='follow_id'),
+        'id': StringAttribute(serializer_method='follow_id'),
         'relationships': {
             'follower': SchemaRelationship(model_type='user', id_attribute='follower_id'),
             'followed': SchemaRelationship(model_type='user', id_attribute='followed_id')
