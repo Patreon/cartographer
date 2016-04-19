@@ -14,7 +14,7 @@ class JSONAPISerializer(object):
         """Override this in a subclass to return a type name string"""
         raise NotImplementedError()
 
-    def as_json(self):
+    def attributes_dictionary(self):
         """Override this in a subclass to return json"""
         raise NotImplementedError()
 
@@ -148,12 +148,12 @@ class JSONAPISerializer(object):
 
     def as_json_api_data(self, version):
         if version == JSONAPIVersion.JSONAPI_1_0:
-            attributes = self.as_json()
+            attributes = self.attributes_dictionary()
             if 'id' in attributes:
                 del attributes['id']
             json = {'attributes': attributes}
         else:
-            json = self.as_json()
+            json = self.attributes_dictionary()
         json["id"] = self.resource_id_str()
         json["type"] = self.resource_type()
         links = self.resource_links_json(version)

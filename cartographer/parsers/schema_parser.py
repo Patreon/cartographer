@@ -14,19 +14,19 @@ class SchemaParser(PostedDocument):
 
     def __init__(self, json_data=None,
                  inbound_request=None, inbound_session=None,
-                 parent_resource=None, relationship_name=None,
+                 parent_parser=None, relationship_name=None,
                  current_user_id=None,
                  version=None):
         """
         Route files should pass in `inbound_request` and `inbound_session`,
-        Resource files should pass in `parent_resource` and `relationship_name`
+        Resource files should pass in `parent_parser` and `relationship_name`
 
         :param json_data: The json document which will be parsed into table data
-        :param inbound_request: The current `JSONAPIRequest` which is prompting the creation of this resource
-        :param inbound_session: The `JSONAPISession` which is active during the creation of this resource
-        :param parent_resource: The `JSONAPISerializer` which is creating this instance as one of its `linked_resources`
-        :param relationship_name: The name by which the parent_resource refers to this instance
-        :param current_user_id: The ID of the user on behalf of whom the resource is being created
+        :param inbound_request: The current `JSONAPIRequest` which is prompting the parsing of this resource
+        :param inbound_session: The `JSONAPISession` which is active during the parsing of this resource
+        :param parent_parser: The `PostedDocument` which is creating this instance for assistance in parsing one of its related resources
+        :param relationship_name: The name by which the parent_parser refers to this instance
+        :param current_user_id: The ID of the user on behalf of whom the resource is being parsed
         :param version: The version of the JSON API spec that the posted document is using
 
         :return: A instance of SchemaParser (or more typically a subclass),
@@ -43,8 +43,8 @@ class SchemaParser(PostedDocument):
             json_data = inbound_request.get_json(force=True)
         super().__init__(json_data=json_data, version=version)
 
-        if parent_resource and not current_user_id:
-            current_user_id = parent_resource.current_user_id
+        if parent_parser and not current_user_id:
+            current_user_id = parent_parser.current_user_id
 
         if current_user_id is None and inbound_session:
             current_user_id = inbound_session.user_id
@@ -150,6 +150,6 @@ class SchemaParser(PostedDocument):
 
     # # Validation
 
-    def validate(self, resource):
+    def validate(self, inbound_data):
         """Override this in a subclass to enforce format and content rules for the inbound JSON API document"""
         pass
