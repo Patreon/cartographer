@@ -14,5 +14,5 @@ def test_parse_parameters_to_dictionary():
             'one': 'fields-post-one'
         }
     }
-    assert_equals(JSONAPIFlaskRequestMixin._parse_parameters_to_dictionary(params).get('fields', None),
+    assert_equals(JSONAPIFlaskRequestMixin._parse_parameters_to_dictionary(params).get('fields'),
                   expected_result)
