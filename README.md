@@ -196,10 +196,3 @@ The `resource_registry` is a map from `type` strings to their corresponding
 model class, `Schema` class, `SchemaSerializer` and `SchemaParser` classes, and `Mask` class.
 This is used when `SchemaRelationship` instances need to create their related resources,
 and when Serializers and Parsers need to apply masking rules.
-
-
-TODO:
------
-* make example (generic_social_network)
-* check that the resource_registry strategy works
-* pull over tests
