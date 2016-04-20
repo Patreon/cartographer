@@ -46,7 +46,7 @@ class PostedResource(object):
         return self.json_data["type"]
 
     def attribute(self, name):
-        return self.json_data["attributes"].get(name)
+        return self.json_data.get("attributes", {}).get(name)
 
     def assert_type(self, resource_type):
         if self.resource_type() != resource_type:
@@ -54,10 +54,7 @@ class PostedResource(object):
         return self
 
     def relationship(self, relationship_name):
-        if "relationships" not in self.json_data:
-            return None
-
-        if relationship_name not in self.json_data["relationships"]:
+        if relationship_name not in self.json_data.get("relationships", {}):
             return None
 
         return PostedRelationship(self.json_data["relationships"][relationship_name], self.document)

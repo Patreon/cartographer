@@ -31,6 +31,13 @@ class PostParser(SchemaParser):
     def schema(cls):
         return PostSchema
 
+    def validate(self, inbound_data):
+        super().validate(inbound_data)
+        if not (inbound_data.relationship_id('author') and inbound_data.relationship_id('author').resource_id()):
+            raise Exception("Provided post object was missing the author id field")
+        if not inbound_data.attribute('body'):
+            raise Exception("Provided post object was missing the body field")
+
 
 class PostResource(APIResource):
     SCHEMA = PostSchema

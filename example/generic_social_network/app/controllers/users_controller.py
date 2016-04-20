@@ -82,7 +82,10 @@ def get_user_or_404(user_id):
 
 
 def validate_inbound_user(request_, user_id, user_found_behavior):
-    table_data = UserParser(inbound_request=request_).validated_table_data()
+    try:
+        table_data = UserParser(inbound_request=request_).validated_table_data()
+    except Exception as e:
+        abort(400, ', '.join(e.args))
     table_data = standardize_user_ids_or_abort(table_data, user_id)
     user_id = table_data['user_id']
     user = users_dbm.find_by_id(user_id)
@@ -91,8 +94,8 @@ def validate_inbound_user(request_, user_id, user_found_behavior):
 
 
 def standardize_user_ids_or_abort(json, user_id):
-    if not json:
-        abort(400, 'No user data was provided in your request')
+    if json is None:
+        json = {}
     if 'user_id' in json:
         if user_id != json['user_id']:
             abort(400, 'Provided user object had a id that did not match the provided route')

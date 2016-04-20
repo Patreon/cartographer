@@ -62,7 +62,5 @@ class UserReadHistoryDBM:
         self.db.session.commit()
 
     def create_with_ids(self, user_id, post_id):
-        print('creating', {'user_id': user_id,
-                                      'post_id': post_id})
         return self.create_from_json({'user_id': user_id,
                                       'post_id': post_id})

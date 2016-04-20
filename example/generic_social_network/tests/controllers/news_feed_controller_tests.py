@@ -5,8 +5,13 @@ from .controller_test_case import ControllerTestCase
 class NewsFeedControllerTestCase(ControllerTestCase):
     def make_a_user(self, id_=1):
         user_json = {
-            'name': 'Jane Doe',
-            'id': id_
+            'data': {
+                'type': 'user',
+                'id': str(id_),
+                'attributes': {
+                    'name': 'Jane Doe'
+                }
+            }
         }
         return self.app.post('/users/{0}'.format(id_),
                              data=json.dumps(user_json),
@@ -14,10 +19,22 @@ class NewsFeedControllerTestCase(ControllerTestCase):
 
     def make_a_post(self, post_id=1, author_id=1):
         post_json = {
-            'id': post_id,
-            'author_id': author_id,
-            'title': 'An Inspirational Blog Post',
-            'body': 'Be yourself, but also you can change for the better.',
+            'data': {
+                'id': str(post_id),
+                'type': 'post',
+                'attributes': {
+                    'title': 'An Inspirational Blog Post',
+                    'body': 'Be yourself, but also you can change for the better.'
+                },
+                'relationships': {
+                    'author': {
+                        'data': {
+                            'id': str(author_id),
+                            'type': 'user'
+                        }
+                    }
+                }
+            }
         }
         return self.app.post('/posts/{0}'.format(post_id),
                              data=json.dumps(post_json),
@@ -41,19 +58,39 @@ class NewsFeedControllerTestCase(ControllerTestCase):
 
         # get made user
         get_response = self.app.get('/news_feed/{0}'.format(id_))
-        expected_response = {'posts': [
-            {'body': 'Be yourself, but also you can change for the better.', 'author_id': 20,
-             'id': 20, 'title': 'An Inspirational Blog Post'},
-            {'body': 'Be yourself, but also you can change for the better.', 'author_id': 20,
-             'id': 21, 'title': 'An Inspirational Blog Post'},
-            {'body': 'Be yourself, but also you can change for the better.', 'author_id': 20,
-             'id': 22, 'title': 'An Inspirational Blog Post'},
-            {'body': 'Be yourself, but also you can change for the better.', 'author_id': 30,
-             'id': 30, 'title': 'An Inspirational Blog Post'},
-            {'body': 'Be yourself, but also you can change for the better.', 'author_id': 30,
-             'id': 31, 'title': 'An Inspirational Blog Post'},
-            {'body': 'Be yourself, but also you can change for the better.', 'author_id': 30,
-             'id': 32, 'title': 'An Inspirational Blog Post'}]}
-        self.check_response(get_response, 200, expected_response)
+        expected_response = {
+            'data': [
+                {'id': '20', 'type': 'post',
+                 'attributes': {'title': 'An Inspirational Blog Post',
+                                'body': 'Be yourself, but also you can change for the better.'},
+                 'relationships': {'author': {'data': {'id': '20', 'type': 'user'}}}},
+                {'id': '21', 'type': 'post',
+                 'attributes': {'title': 'An Inspirational Blog Post',
+                                'body': 'Be yourself, but also you can change for the better.'},
+                 'relationships': {'author': {'data': {'id': '20', 'type': 'user'}}}},
+                {'id': '22', 'type': 'post',
+                 'attributes': {'title': 'An Inspirational Blog Post',
+                                'body': 'Be yourself, but also you can change for the better.'},
+                 'relationships': {'author': {'data': {'id': '20', 'type': 'user'}}}},
+                {'id': '30', 'type': 'post',
+                 'attributes': {'title': 'An Inspirational Blog Post',
+                                'body': 'Be yourself, but also you can change for the better.'},
+                 'relationships': {'author': {'data': {'id': '30', 'type': 'user'}}}},
+                {'id': '31', 'type': 'post',
+                 'attributes': {'title': 'An Inspirational Blog Post',
+                                'body': 'Be yourself, but also you can change for the better.'},
+                 'relationships': {'author': {'data': {'id': '30', 'type': 'user'}}}},
+                {'id': '32', 'type': 'post',
+                 'attributes': {'title': 'An Inspirational Blog Post',
+                                'body': 'Be yourself, but also you can change for the better.'},
+                 'relationships': {'author': {'data': {'id': '30', 'type': 'user'}}}}
+            ],
+            'included': [
+                {'attributes': {'name': 'Jane Doe'}, 'type': 'user', 'id': '20'},
+                {'attributes': {'name': 'Jane Doe'}, 'type': 'user', 'id': '30'}
+            ]
+        }
+        self.check_jsonapi_response(get_response, 200, expected_response)
+
 
 suite = NewsFeedControllerTestCase.suite()

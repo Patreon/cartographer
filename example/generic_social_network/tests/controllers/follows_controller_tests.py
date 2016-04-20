@@ -1,14 +1,17 @@
 import json
-
-from generic_social_network.app.models.follow import Follow
 from .controller_test_case import ControllerTestCase
 
 
 class FollowsControllerTestCase(ControllerTestCase):
     def make_a_user(self, id_='myuserid'):
         user_json = {
-            'name': 'Jane Doe',
-            'id': id_
+            'data': {
+                'type': 'user',
+                'id': id_,
+                'attributes': {
+                    'name': 'Jane Doe'
+                }
+            }
         }
         return self.app.post('/users/{0}'.format(id_),
                              data=json.dumps(user_json),
@@ -24,8 +27,40 @@ class FollowsControllerTestCase(ControllerTestCase):
 
     def expected_json(self, follower_id, followed_id):
         return {
-            'follower_id': follower_id,
-            'followed_id': followed_id,
+            'data': {
+                'id': '{follower_id}-{followed_id}'.format(
+                    follower_id=follower_id,
+                    followed_id=followed_id
+                ),
+                'attributes': {},
+                'type': 'follow',
+                'relationships': {
+                    'follower': {
+                        'data': {
+                            'id': str(follower_id),
+                            'type': 'user'
+                        }
+                    },
+                    'followed': {
+                        'data': {
+                            'id': str(followed_id),
+                            'type': 'user'
+                        }
+                    }
+                }
+            },
+            'included': [
+                {
+                    'id': str(follower_id),
+                    'attributes': {'name': 'Jane Doe'},
+                    'type': 'user'
+                },
+                {
+                    'id': str(followed_id),
+                    'attributes': {'name': 'Jane Doe'},
+                    'type': 'user'
+                }
+            ]
         }
 
     def test_get_follow(self):
@@ -34,9 +69,7 @@ class FollowsControllerTestCase(ControllerTestCase):
 
         expected_response = self.expected_json(follower_id, followed_id)
         get_response = self.app.get('/follows/{0}/{1}'.format(follower_id, followed_id))
-        self.check_response(get_response, 200,
-                            dict(expected_response.items() + {
-                                'uri': 'http://localhost/follows/{0}/{1}'.format(follower_id, followed_id)}.items()))
+        self.check_jsonapi_response(get_response, 200, expected_response)
 
     def test_get_nonexistant_follow(self):
         # 404's when the users don't exist
@@ -62,9 +95,7 @@ class FollowsControllerTestCase(ControllerTestCase):
 
         expected_response = self.expected_json(follower_id, followed_id)
         create_response = self.app.post('/follows/{0}/{1}'.format(follower_id, followed_id))
-        self.check_response(create_response, 201,
-                            dict(expected_response.items() + {
-                                'uri': 'http://localhost/follows/{0}/{1}'.format(follower_id, followed_id)}.items()))
+        self.check_jsonapi_response(create_response, 201, expected_response)
 
     def test_create_invalid_follow(self):
         user_id = 'myuserid'
@@ -95,9 +126,7 @@ class FollowsControllerTestCase(ControllerTestCase):
         # delete made follow
         expected_response = self.expected_json(follower_id, followed_id)
         delete_response = self.app.delete('/follows/{0}/{1}'.format(follower_id, followed_id))
-        self.check_response(delete_response, 200,
-                            dict(expected_response.items() + {
-                                'uri': 'http://localhost/follows/{0}/{1}'.format(follower_id, followed_id)}.items()))
+        self.check_jsonapi_response(delete_response, 200, expected_response)
 
         # check that get now fails
         response = self.app.get('/follows/{0}/{1}'.format(follower_id, followed_id))

@@ -1,12 +1,18 @@
 import json
+from copy import deepcopy
 from .controller_test_case import ControllerTestCase
 
 
 class UsersControllerTestCase(ControllerTestCase):
     def default_user_json(self, id_=1):
         return {
-            'name': 'Jane Doe',
-            'id': id_
+            'data': {
+                'type': 'user',
+                'id': str(id_),
+                'attributes': {
+                    'name': 'Jane Doe'
+                }
+            }
         }
 
     def make_a_user(self, id_=1):
@@ -21,8 +27,7 @@ class UsersControllerTestCase(ControllerTestCase):
 
         # get made user
         get_response = self.app.get('/users/{0}'.format(id_))
-        self.check_response(get_response, 200,
-                            dict(post_data.items() + {'uri': 'http://localhost/users/{0}'.format(id_)}.items()))
+        self.check_jsonapi_response(get_response, 200, post_data)
 
     def test_get_nonexistant_user(self):
         response = self.app.get('/users/999')
@@ -35,36 +40,35 @@ class UsersControllerTestCase(ControllerTestCase):
         post_data = self.default_user_json(id_)
         create_response = self.app.post('/users/{0}'.format(id_), data=json.dumps(post_data),
                                         content_type='application/json')
-        self.check_response(create_response, 201,
-                            dict(post_data.items() + {'uri': 'http://localhost/users/{0}'.format(id_)}.items()))
+        self.check_jsonapi_response(create_response, 201, post_data)
 
     def test_create_invalid_user(self):
         # missing name
-        post_data = dict(
-            userid=1
-        )
+        post_data = {
+            'data': {
+                'type': 'user',
+                'id': '1'
+            }
+        }
         create_response = self.app.post('/users/1', data=json.dumps(post_data), content_type='application/json')
         self.check_response(create_response, 400,
                             {'error': 'Provided user object was missing the name field'})
 
     def test_create_best_effort_userid(self):
-        post_data_no_id = dict(
-            name='Jane Doe'
-        )
+        post_data_no_id = {
+            'data': {
+                'type': 'user',
+                'attributes': {
+                    'name': 'Jane Doe'
+                }
+            }
+        }
         create_response = self.app.post('/users/1', data=json.dumps(post_data_no_id),
                                         content_type='application/json')
-        self.check_response(create_response, 201,
-                            dict(post_data_no_id.items() + {'uri': 'http://localhost/users/1',
-                                                            'id': 1}.items()))
+        expected_response = deepcopy(post_data_no_id)
+        expected_response['data'].update({'id': '1'})
+        self.check_jsonapi_response(create_response, 201, expected_response)
 
-        post_data_wrong_id = dict(
-            name='Jane Doe',
-            id=999
-        )
-        create_response = self.app.post('/users/12', data=json.dumps(post_data_wrong_id),
-                                        content_type='application/json')
-        self.check_response(create_response, 400,
-                            {'error': 'Provided user object had a id that did not match the provided route'})
 
     def test_create_duplicate_userid(self):
         id_ = 1
@@ -83,8 +87,7 @@ class UsersControllerTestCase(ControllerTestCase):
 
         # delete made user
         delete_response = self.app.delete('/users/{0}'.format(id_))
-        self.check_response(delete_response, 200,
-                            dict(post_data.items() + {'uri': 'http://localhost/users/{0}'.format(id_)}.items()))
+        self.check_jsonapi_response(delete_response, 200, post_data)
 
         # check that get now fails
         response = self.app.get('/users/{0}'.format(id_))
@@ -107,12 +110,11 @@ class UsersControllerTestCase(ControllerTestCase):
         post_data['name'] = 'John Doe'
         update_response = self.app.put('/users/{0}'.format(id_), data=json.dumps(post_data),
                                        content_type='application/json')
-        expected_response = dict(post_data.items() + {'uri': 'http://localhost/users/{0}'.format(id_)}.items())
-        self.check_response(update_response, 200, expected_response)
+        self.check_jsonapi_response(update_response, 200, post_data)
 
         # check that get now has the new data too
         get_response = self.app.get('/users/{0}'.format(id_))
-        self.check_response(update_response, 200, expected_response)
+        self.check_jsonapi_response(update_response, 200, post_data)
 
     def test_update_invalid_user(self):
         id_ = 1
@@ -120,7 +122,7 @@ class UsersControllerTestCase(ControllerTestCase):
         self.make_a_user(id_)
 
         # modify the user in an invalid way (missing name)
-        del post_data['name']
+        del post_data['data']['attributes']['name']
         update_response = self.app.put('/users/{0}'.format(id_), data=json.dumps(post_data),
                                        content_type='application/json')
         self.check_response(update_response, 400,
@@ -129,14 +131,12 @@ class UsersControllerTestCase(ControllerTestCase):
         # check that get still has the old data
         post_data = self.default_user_json(id_)
         get_response = self.app.get('/users/{0}'.format(id_))
-        self.check_response(get_response, 200,
-                            dict(post_data.items() + {'uri': 'http://localhost/users/{0}'.format(id_)}.items()))
+        self.check_jsonapi_response(get_response, 200, post_data)
 
     def test_update_nonexistant_user(self):
         # without post body data
         response = self.app.put('/users/999')
-        self.check_response(response, 400,
-                            {'error': 'No user data was provided in your request'})
+        self.check_response(response, 400, None)
 
         # with post body data
         id_ = 987

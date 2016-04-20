@@ -89,7 +89,10 @@ def success_with_post(post, request_=None):
 
 
 def validate_inbound_post(request_, post_id, post_found_behavior):
-    table_data = PostParser(inbound_request=request_).validated_table_data()
+    try:
+        table_data = PostParser(inbound_request=request_).validated_table_data()
+    except Exception as e:
+        abort(400, ', '.join(e.args))
     table_data = standardize_post_ids_or_abort(table_data, post_id)
     post_id = table_data['post_id']
     post = posts_dbm.find_by_id(post_id)

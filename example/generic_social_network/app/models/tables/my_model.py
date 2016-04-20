@@ -143,8 +143,8 @@ class MyModel(Model):
         from generic_social_network.app import db
 
         clear_request_cache()
-        result = db.session.execute(
-            InsertOnDuplicate(cls.__table__).values(insert_values))
+        insert_operation = cls.__table__.insert().prefix_with("OR REPLACE").values(insert_values)
+        result = db.session.execute(insert_operation)
         return cls.primary_key_from_insert_or_update(result)
 
     def delete(self):

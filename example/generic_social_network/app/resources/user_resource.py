@@ -27,6 +27,11 @@ class UserParser(SchemaParser):
     def schema(cls):
         return UserSchema
 
+    def validate(self, inbound_data):
+        super().validate(inbound_data)
+        if not inbound_data.attribute('name'):
+            raise Exception("Provided user object was missing the name field")
+
 
 class UserResource(APIResource):
     SCHEMA = UserSchema
