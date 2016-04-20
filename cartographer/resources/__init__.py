@@ -10,5 +10,4 @@ def get_resource_registry_container():
 
 
 def get_resource_registry():
-    global _resource_registry
-    return _resource_registry.registry
+    return get_resource_registry_container().registry
