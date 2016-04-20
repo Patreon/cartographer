@@ -29,13 +29,11 @@ class ResourceRegistry(object):
 
     def register_resource(self, type_string, schema, model=None,
                           serializer=None, parser=None, mask=None):
-        existing_registration = self.registry[type_string]
-        additional_details = filter_dict({
+        self.registry[type_string].update(filter_dict({
             ResourceRegistryKeys.TYPE: type_string,
             ResourceRegistryKeys.SCHEMA: schema,
             ResourceRegistryKeys.MODEL: model,
             ResourceRegistryKeys.SERIALIZER: serializer,
             ResourceRegistryKeys.PARSER: parser,
             ResourceRegistryKeys.MASK: mask,
-        })
-        self.registry[type_string] = dict(existing_registration.items() | additional_details.items())
+        }))
