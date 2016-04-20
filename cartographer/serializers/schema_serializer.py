@@ -173,7 +173,7 @@ class SchemaSerializer(JSONAPISerializer):
         Priming is how we make this more performant --
         at initialization time, each sibling node primes the queries it will perform,
         so that when a node eventually performs the query, it can perform all the queries together
-        (via our `patreon.services.caching.multiget_cached` wrapper)
+        (via our `https://github.com/Patreon/flask-caching-services` `MultigetCache` wrapper)
         """
         relationship_keys = self.schema().relationships()
         if relationship_keys:
@@ -193,7 +193,8 @@ class SchemaSerializer(JSONAPISerializer):
 
         if relationship_type is not None and id_attribute is not None:
             relationship_model_class = get_resource_registry().get(relationship_type).get(ResourceRegistryKeys.MODEL)
-            if hasattr(relationship_model_class.get, 'prime') \
+            if hasattr(relationship_model_class, 'get') \
+                    and hasattr(relationship_model_class.get, 'prime') \
                     and getattr(relationship_model_class.get, 'multiget') is not None:
                 relationship_model_class.get.prime(getattr(self.model, id_attribute))
 
