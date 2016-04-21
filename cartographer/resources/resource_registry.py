@@ -7,10 +7,12 @@ from cartographer.utils.collections import filter_dict
 class ResourceRegistryKeys(Enum):
     TYPE = "type"
     SCHEMA = "schema"
-    MODEL = "model"
     SERIALIZER = "serializer"
     PARSER = "parser"
     MASK = "mask"
+    MODEL = "model"
+    MODEL_GET = "model_get"
+    MODEL_PRIME = "model_prime"
 
 
 class ResourceRegistry(object):
@@ -27,13 +29,16 @@ class ResourceRegistry(object):
             self.initialization_hook()
             self.hook_called = True
 
-    def register_resource(self, type_string, schema, model=None,
-                          serializer=None, parser=None, mask=None):
+    def register_resource(self, type_string, schema,
+                          serializer=None, parser=None, mask=None,
+                          model=None, model_get=None, model_prime=None,):
         self.registry[type_string].update(filter_dict({
             ResourceRegistryKeys.TYPE: type_string,
             ResourceRegistryKeys.SCHEMA: schema,
-            ResourceRegistryKeys.MODEL: model,
             ResourceRegistryKeys.SERIALIZER: serializer,
             ResourceRegistryKeys.PARSER: parser,
             ResourceRegistryKeys.MASK: mask,
+            ResourceRegistryKeys.MODEL: model,
+            ResourceRegistryKeys.MODEL_GET: model_get,
+            ResourceRegistryKeys.MODEL_PRIME: model_prime
         }))

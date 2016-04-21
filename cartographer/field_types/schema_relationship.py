@@ -54,10 +54,10 @@ class SchemaRelationship(object):
 
         model = None
         if self.id_attribute is not None:
-            relationship_model_class = self.resource_registry_entry().get(ResourceRegistryKeys.MODEL)
+            related_model_getter = self.resource_registry_entry().get(ResourceRegistryKeys.MODEL_GET)
             model_id = getattr(parent_serializer.model, self.id_attribute)
-            if model_id is not None and hasattr(relationship_model_class, 'get'):
-                model = relationship_model_class.get(model_id)
+            if model_id is not None and related_model_getter is not None:
+                model = related_model_getter(model_id)
         elif self.model_property is not None:
             model = getattr(parent_serializer.model, self.model_property)
         elif self.model_method is not None:

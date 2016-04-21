@@ -114,7 +114,7 @@ class SchemaSerializer(JSONAPISerializer):
         return cls.schema().route_prefix()
 
     def resource_url(self):
-        if self.route_prefix():
+        if config.api_server and self.route_prefix():
             return "https://{server}/{route}/{id}".format(
                 server=config.api_server,
                 route=self.route_prefix(),
@@ -191,12 +191,11 @@ class SchemaSerializer(JSONAPISerializer):
                 relationship_type = relationship_data_schema.model_type
                 id_attribute = relationship_data_schema.id_attribute
 
-        if relationship_type is not None and id_attribute is not None:
-            relationship_model_class = get_resource_registry().get(relationship_type).get(ResourceRegistryKeys.MODEL)
-            if hasattr(relationship_model_class, 'get') \
-                    and hasattr(relationship_model_class.get, 'prime') \
-                    and getattr(relationship_model_class.get, 'multiget') is not None:
-                relationship_model_class.get.prime(getattr(self.model, id_attribute))
+        if relationship_type is not None and id_attribute is not None and hasattr(self.model, id_attribute):
+            relationship_model_get_primer = get_resource_registry().get(relationship_type) \
+                .get(ResourceRegistryKeys.MODEL_PRIME)
+            if relationship_model_get_primer is not None:
+                relationship_model_get_primer(getattr(self.model, id_attribute))
 
     # Attributes
 

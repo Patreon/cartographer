@@ -11,7 +11,7 @@ Table of Contents
 2. Resources
 3. Parsers
 4. Masks
-5. Miscellaneous
+5. APIResource
 
 
 Schemas
@@ -188,11 +188,45 @@ and will not check whether or not the resource *itself* should be (de)serialized
 To hook your Mask up to its corresponding Serializer and Parser, you should register your Mask in its appropriate place in the [`resource_registry`](#Miscellaneous).
 
 
-Miscellaneous
+Resource Registration
 -----
 ### `resource_registry`
 
-The `resource_registry` is a map from `type` strings to their corresponding
-model class, `Schema` class, `SchemaSerializer` and `SchemaParser` classes, and `Mask` class.
-This is used when `SchemaRelationship` instances need to create their related resources,
+The `resource_registry` is a map from `type` strings to a dict of:
+* `ResourceRegistryKeys.MODEL`, their corresponding
+model class
+    * `ResourceRegistryKeys.MODEL_GET`, a method for fetching models by id
+    * `ResourceRegistryKeys.MODEL_PRIME`, a method for optimizing future `MODEL_GET` calls
+* `ResourceRegistryKeys.SCHEMA`, their corresponding `Schema` class
+* `ResourceRegistryKeys.SERIALIZER`, their corresponding `SchemaSerializer` class
+* `ResourceRegistryKeys.PARSER`, their corresponding `SchemaParser` class
+* `ResourceRegistryKeys.MASK`, their corresponding `Mask` class
+
+This map is used under the hood when `SchemaRelationship` instances need to create their related resources,
 and when Serializers and Parsers need to apply masking rules.
+
+You can add your classes to the registry via
+`cartographer.resource_registry.get_resource_registry_container().register_resource()`,
+or (more commonly) use the `APIResource` convenience class and decorators outlined below.
+
+### `APIResource`
+
+`APIResource` is a convenience class for registering
+the family of classes used in cartographer for a given domain object.
+It has a class properties corresponding to the entries in the `resource_registry`:
+* `APIResource.SCHEMA`, a subclass of `Schema`
+* `APIResource.SERIALIZER`, a subclass of `SchemaSerializer`
+* `APIResource.PARSER`, a subclass of `SchemaParser`
+* `APIResource.MASK`, a subclass of `BaseMask`
+* `APIResource.MODEL`, the object class which you are serializing and parsing
+* `APIResource.MODEL_GET`, a method that can be passed an `id` and will return an instance of `APIResource.MODEL`
+* `APIResource.MODEL_PRIME`, a method that can be passed an `id` which will improve the performance of future `MODEL_GET` calls
+
+To use this convenience class, you subclass it and either define those class properties
+and then call `MyAPIResourceSubclass.register_class()`
+or use e.g.
+```python
+@MyAPIResourceSubclass.register(ResourceRegistryKeys.PARSER)
+class MySchemaParserSubclass(SchemaParser):
+    ...
+```
