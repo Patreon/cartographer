@@ -45,35 +45,61 @@ class SchemaSerializer(JSONAPISerializer):
             if not current_user_id:
                 current_user_id = parent_serializer.current_user_id
 
-        if includes is None:
-            if parent_serializer is not None and relationship_name is not None:
-                prefix = relationship_name + '.'
-                includes = [include_path[len(prefix):]
-                            for include_path in parent_serializer.includes
-                            if include_path.startswith(prefix)]
-                if len(includes) == 0:
-                    # TODO: kill all uses of request.args.get('use-defaults-for-included-resources') in clients
-                    includes = type(self).default_includes()
-            else:
-                if inbound_request:
-                    includes = inbound_request.get_includes()
-                if includes is None:
-                    includes = type(self).default_includes()
+        if includes is None and parent_serializer is not None and relationship_name is not None:
+            prefix = relationship_name + '.'
+            includes = [include_path[len(prefix):]
+                        for include_path in parent_serializer.includes
+                        if include_path.startswith(prefix)]
+
         self.includes = includes
-
-        if requested_fields is None and inbound_request:
-            requested_fields = inbound_request.get_requested_fields()
+        self.parent_serializer = parent_serializer
         self.requested_fields = requested_fields
-
-        if current_user_id is None and inbound_session:
-            current_user_id = inbound_session.user_id
         self.current_user_id = current_user_id
+
+        self.request = inbound_request
+        self.session = inbound_session
 
         self._linked_resources = None
         self._masked_fields = None
         self._masked_includes = None
 
         self.prime_for_includes()
+
+    @property
+    def request(self):
+        return self._request
+
+    @request.setter
+    def request(self, request):
+        if not self.parent_serializer and request:
+            self.includes = request.get_includes()
+
+        if not self.requested_fields and request:
+            self.requested_fields = request.get_requested_fields()
+
+        self._request = request
+
+    @property
+    def session(self):
+        return self._session
+
+    @session.setter
+    def session(self, session):
+        if not self.current_user_id and session:
+            self.current_user_id = session.user_id
+
+        self._session = session
+
+    @property
+    def includes(self):
+        return self._includes
+
+    @includes.setter
+    def includes(self, includes):
+        if not includes:
+            includes = type(self).default_includes()
+
+        self._includes = includes
 
     @classmethod
     def schema(cls):
