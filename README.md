@@ -12,7 +12,6 @@ Table of Contents
 3. Parsers
 4. Masks
 5. APIResource
-
 6. Installation
 7. Contributing
 
