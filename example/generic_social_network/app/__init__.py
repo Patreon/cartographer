@@ -9,6 +9,7 @@ my_app.session_interface = MySessionInterface()
 my_app.request_class = MyRequest
 
 db = db_wrapper.connect(my_app)
+db_wrapper.build_if_needed(db)
 
 # set up routing & controllers
 from .controllers import users_controller, posts_controller, follows_controller, news_feed_controller, \
