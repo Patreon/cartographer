@@ -13,6 +13,9 @@ Table of Contents
 4. Masks
 5. APIResource
 
+6. Installation
+7. Contributing
+
 
 Schemas
 -----
@@ -230,3 +233,22 @@ or use e.g.
 class MySchemaParserSubclass(SchemaParser):
     ...
 ```
+
+
+Installation
+-----
+Get the egg from [PyPI](https://pypi.python.org/pypi/cartographer),
+typically via `pip`: `pip install cartographer`
+
+
+Contributing
+---
+1. `git clone git@github.com:Patreon/cartographer.git`
+2. `cd cartographer`
+3. `git checkout -b my-meaningful-improvements`
+4. Write beautiful code that improves the project, creating or modifying tests to prove correctness.
+5. Commit said code and tests in a well-organized way.
+6. Confirm tests pass with `./run_tests.sh` (you may need to `./setup_environments.sh` first)
+7. `git push origin my-meaningful-improvements`
+8. Open a pull request (`hub pull-request`, if you have [`hub`](https://github.com/github/hub))
+9. Have a chill discussion with the community about how to best integrate your improvements into mainline deployments
