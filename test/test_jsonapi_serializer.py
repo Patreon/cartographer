@@ -13,7 +13,7 @@ class ExampleSerializer(JSONAPISerializer):
     def resource_id(self):
         return str(self._id)
 
-    def as_json(self):
+    def attributes_dictionary(self):
         return {
             "title": "an example"
         }
@@ -30,7 +30,7 @@ class LinkingResource(JSONAPISerializer):
     def resource_id(self):
         return str(self._id)
 
-    def as_json(self):
+    def attributes_dictionary(self):
         return {
             "title": "an example of linking"
         }
