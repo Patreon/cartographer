@@ -13,7 +13,7 @@ class NewsFeedControllerTestCase(ControllerTestCase):
                 }
             }
         }
-        return self.app.post('/users/{0}'.format(id_),
+        return self.app.post('/users',
                              data=json.dumps(user_json),
                              content_type='application/json')
 
@@ -36,7 +36,7 @@ class NewsFeedControllerTestCase(ControllerTestCase):
                 }
             }
         }
-        return self.app.post('/posts/{0}'.format(post_id),
+        return self.app.post('/posts',
                              data=json.dumps(post_json),
                              content_type='application/json')
 

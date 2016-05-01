@@ -22,12 +22,17 @@ class UsersDBM:
         raise Exception
 
     def create_from_json(self, json):
-        User.insert(json)
+        user_id = User.insert(json)
+        user_id = user_id[0]
         self.db.session.commit()
+        return user_id
 
     def update_from_json(self, json):
         User.insert_on_duplicate_key_update(json)
         self.db.session.commit()
+
+    def delete_by_id(self, user_id):
+        self.delete(user_id=user_id)
 
     def delete(self, user=None, user_id=None):
         if user_id is None:

@@ -3,17 +3,17 @@ from .controller_test_case import ControllerTestCase
 
 
 class FollowsControllerTestCase(ControllerTestCase):
-    def make_a_user(self, id_='myuserid'):
+    def make_a_user(self, id_=1):
         user_json = {
             'data': {
                 'type': 'user',
-                'id': id_,
+                'id': str(id_),
                 'attributes': {
                     'name': 'Jane Doe'
                 }
             }
         }
-        return self.app.post('/users/{0}'.format(id_),
+        return self.app.post('/users',
                              data=json.dumps(user_json),
                              content_type='application/json')
 
@@ -98,7 +98,7 @@ class FollowsControllerTestCase(ControllerTestCase):
         self.check_jsonapi_response(create_response, 201, expected_response)
 
     def test_create_invalid_follow(self):
-        user_id = 'myuserid'
+        user_id = 1
         self.make_a_user(user_id)
         # follower doesn't exist
         create_response = self.app.post('/follows/nonce/{0}'.format(user_id))

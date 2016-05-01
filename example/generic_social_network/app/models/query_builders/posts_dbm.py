@@ -33,12 +33,17 @@ class PostsDBM:
             .all()
 
     def create_from_json(self, json):
-        Post.insert(json)
+        post_id = Post.insert(json)
+        post_id = post_id[0]
         self.db.session.commit()
+        return post_id
 
     def update_from_json(self, json):
         Post.insert_on_duplicate_key_update(json)
         self.db.session.commit()
+
+    def delete_by_id(self, post_id):
+        self.delete(post_id=post_id)
 
     def delete(self, post=None, post_id=None):
         if post_id is None:

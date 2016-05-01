@@ -75,6 +75,12 @@ class SchemaParser(PostedDocument):
 
             data = self.data()
 
+            parsed_id = self.parse_schema_id()
+            if parsed_id and len(parsed_id) == 2:
+                result_key, parsed_value = parsed_id
+                if parsed_value:
+                    result[result_key] = parsed_value
+
             json_attributes = data.json_data.get('attributes', {})
             if json_attributes:
                 for key in json_attributes:
@@ -95,6 +101,22 @@ class SchemaParser(PostedDocument):
 
             self._table_data = result
         return self._table_data
+
+    def parse_schema_id(self):
+        """
+        Note: currently only handles SchemaAttributes which are model properties.
+        The assumption here is that computed values are read-only,
+        as will the attributes, but here we can also assume that it matches the primary key
+
+        :return: A tuple of the model property name and its corresponding parsed id
+        """
+        schema_attribute = self.schema().resource_id()
+        if schema_attribute \
+                and schema_attribute.model_attribute \
+                and schema_attribute.is_property:
+            serialized_value = self.data().resource_id()
+            return schema_attribute.model_attribute, schema_attribute.from_json(serialized_value)
+        # TODO: let SchemaAttribute declare parser_method
 
     # Attributes
 

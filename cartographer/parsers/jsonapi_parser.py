@@ -42,6 +42,9 @@ class PostedResource(object):
         self.json_data = json_data
         self.document = document
 
+    def resource_id(self):
+        return self.json_data.get("id")
+
     def resource_type(self):
         return self.json_data["type"]
 

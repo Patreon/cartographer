@@ -36,7 +36,7 @@ class TestData(object):
                 }
             }
         }
-        return self.app.post('/users/{0}'.format(id_),
+        return self.app.post('/users',
                              data=json.dumps(user_json),
                              content_type='application/json')
 

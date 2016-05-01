@@ -23,11 +23,14 @@ class ControllerTestCase(unittest.TestCase):
             print(response.status_code, expected_code)
         assert response.status_code == expected_code
         if expected_json is not None:
-            assert json.loads(response.data.decode('utf-8')) == expected_json
+            response_json = json.loads(response.data.decode('utf-8'))
+            if response_json != expected_json:
+                print(response_json, 'not equal to', expected_json)
+            assert response_json == expected_json
 
     def check_jsonapi_response(self, response, expected_code, expected_json):
         # print('comparing', response.status_code, 'to', expected_code,
-        #       "\nand comparing", json.loads(response.data), 'to', expected_json)
+        #       "\nand comparing", json.loads(response.data.decode('utf-8')), 'to', expected_json)
         if response.status_code != expected_code:
             print(response.status_code, expected_code)
         assert response.status_code == expected_code

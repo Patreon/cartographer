@@ -16,7 +16,7 @@ class UsersControllerTestCase(ControllerTestCase):
         }
 
     def make_a_user(self, id_=1):
-        return self.app.post('/users/{0}'.format(id_),
+        return self.app.post('/users',
                              data=json.dumps(self.default_user_json(id_)),
                              content_type='application/json')
 
@@ -38,7 +38,7 @@ class UsersControllerTestCase(ControllerTestCase):
     def test_create_valid_user(self):
         id_ = 1
         post_data = self.default_user_json(id_)
-        create_response = self.app.post('/users/{0}'.format(id_), data=json.dumps(post_data),
+        create_response = self.app.post('/users', data=json.dumps(post_data),
                                         content_type='application/json')
         self.check_jsonapi_response(create_response, 201, post_data)
 
@@ -50,32 +50,16 @@ class UsersControllerTestCase(ControllerTestCase):
                 'id': '1'
             }
         }
-        create_response = self.app.post('/users/1', data=json.dumps(post_data), content_type='application/json')
+        create_response = self.app.post('/users', data=json.dumps(post_data), content_type='application/json')
         self.check_response(create_response, 400,
                             {'error': 'Provided user object was missing the name field'})
-
-    def test_create_best_effort_userid(self):
-        post_data_no_id = {
-            'data': {
-                'type': 'user',
-                'attributes': {
-                    'name': 'Jane Doe'
-                }
-            }
-        }
-        create_response = self.app.post('/users/1', data=json.dumps(post_data_no_id),
-                                        content_type='application/json')
-        expected_response = deepcopy(post_data_no_id)
-        expected_response['data'].update({'id': '1'})
-        self.check_jsonapi_response(create_response, 201, expected_response)
-
 
     def test_create_duplicate_userid(self):
         id_ = 1
         self.make_a_user(id_)
 
         post_data = self.default_user_json(id_)
-        create_response = self.app.post('/users/{0}'.format(id_), data=json.dumps(post_data),
+        create_response = self.app.post('/users', data=json.dumps(post_data),
                                         content_type='application/json')
         self.check_response(create_response, 409,
                             {'error': 'user with id 1 already exists'})
@@ -87,7 +71,7 @@ class UsersControllerTestCase(ControllerTestCase):
 
         # delete made user
         delete_response = self.app.delete('/users/{0}'.format(id_))
-        self.check_jsonapi_response(delete_response, 200, post_data)
+        self.check_jsonapi_response(delete_response, 204, None)
 
         # check that get now fails
         response = self.app.get('/users/{0}'.format(id_))
@@ -97,9 +81,9 @@ class UsersControllerTestCase(ControllerTestCase):
 
     def test_delete_nonexistant_user(self):
         response = self.app.delete('/users/999')
-        self.check_response(response, 404,
+        self.check_response(response, 409,
                             {
-                                'error': 'The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.'})
+                                'error': 'A conflict happened while processing the request.  The resource might have been modified while the request was being processed.'})
 
     def test_update_user(self):
         id_ = 1

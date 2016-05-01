@@ -36,12 +36,12 @@ class PostsControllerTestCase(ControllerTestCase):
         }
 
     def make_an_author(self, author_id=1):
-        return self.app.post('/users/{0}'.format(author_id),
+        return self.app.post('/users',
                              data=json.dumps(self.default_author_json(author_id)),
                              content_type='application/json')
 
     def make_a_post(self, post_id=1, author_id=1):
-        return self.app.post('/posts/{0}'.format(post_id),
+        return self.app.post('/posts',
                              data=json.dumps(self.default_post_json(post_id=post_id, author_id=author_id)),
                              content_type='application/json')
 
@@ -72,7 +72,7 @@ class PostsControllerTestCase(ControllerTestCase):
 
         post_id = 1
         post_data = self.default_post_json(post_id)
-        create_response = self.app.post('/posts/{0}'.format(post_id), data=json.dumps(post_data),
+        create_response = self.app.post('/posts', data=json.dumps(post_data),
                                         content_type='application/json')
         expected_response = deepcopy(post_data)
         expected_response.update({'included': [self.default_author_json()['data']]})
@@ -83,7 +83,7 @@ class PostsControllerTestCase(ControllerTestCase):
         post_id = 1
         post_data = self.default_post_json(post_id=post_id)
         del post_data['data']['relationships']['author']['data']['id']
-        create_response = self.app.post('/posts/{0}'.format(post_id), data=json.dumps(post_data),
+        create_response = self.app.post('/posts', data=json.dumps(post_data),
                                         content_type='application/json')
         self.check_response(create_response, 400,
                             {'error': 'Provided post object was missing the author id field'})
@@ -92,7 +92,7 @@ class PostsControllerTestCase(ControllerTestCase):
         self.make_an_author(author_id)
         post_data = self.default_post_json(post_id=post_id, author_id=author_id)
         del post_data['data']['attributes']['body']
-        create_response = self.app.post('/posts/{0}'.format(post_id), data=json.dumps(post_data),
+        create_response = self.app.post('/posts', data=json.dumps(post_data),
                                         content_type='application/json')
         self.check_response(create_response, 400,
                             {'error': 'Provided post object was missing the body field'})
@@ -102,7 +102,7 @@ class PostsControllerTestCase(ControllerTestCase):
         post_data_no_id = self.default_post_json(post_id=post_id)
         del post_data_no_id['data']['id']
         self.make_an_author()
-        create_response = self.app.post('/posts/{0}'.format(post_id), data=json.dumps(post_data_no_id),
+        create_response = self.app.post('/posts', data=json.dumps(post_data_no_id),
                                         content_type='application/json')
 
         expected_response = deepcopy(post_data_no_id)
@@ -116,7 +116,7 @@ class PostsControllerTestCase(ControllerTestCase):
         self.make_an_author_and_post(author_id=author_id, post_id=post_id)
 
         post_data = self.default_post_json(post_id)
-        create_response = self.app.post('/posts/{0}'.format(post_id), data=json.dumps(post_data),
+        create_response = self.app.post('/posts', data=json.dumps(post_data),
                                         content_type='application/json')
         self.check_response(create_response, 409,
                             {'error': 'post with id {0} already exists'.format(post_id)})
@@ -129,9 +129,8 @@ class PostsControllerTestCase(ControllerTestCase):
 
         # delete made user
         delete_response = self.app.delete('/posts/{0}'.format(post_id))
-        expected_response = deepcopy(post_data)
-        expected_response.update({'included': [self.default_author_json()['data']]})
-        self.check_jsonapi_response(delete_response, 200, expected_response)
+        expected_response = None
+        self.check_jsonapi_response(delete_response, 204, expected_response)
 
         # check that get now fails
         response = self.app.get('/posts/{0}'.format(post_id))
@@ -141,9 +140,9 @@ class PostsControllerTestCase(ControllerTestCase):
 
     def test_delete_nonexistant_post(self):
         response = self.app.delete('/posts/999')
-        self.check_response(response, 404,
+        self.check_response(response, 409,
                             {
-                                'error': 'The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.'})
+                                'error': 'A conflict happened while processing the request.  The resource might have been modified while the request was being processed.'})
 
     def test_update_post(self):
         author_id = 1
