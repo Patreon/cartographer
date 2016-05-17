@@ -1,0 +1,15 @@
+machine:
+    python:
+        version: 3.4.2
+
+dependencies:
+  post:
+    - git diff $(git merge-base --octopus origin/master HEAD) | flake8 --diff || exit 1
+
+test:
+    override:
+        - bash run_tests.sh:
+            parallel: False
+            files:
+                - test/**/test_*.py
+                - example/generic_social_network/tests/**/*.py
