@@ -1,5 +1,10 @@
 Cartographer
 =====
+[![CI Status](https://circleci.com/gh/Patreon/cartographer.svg?style=shield&circle-token=d4ade402a04c4a6c63172d78ebfe705a799fc3f4)](https://circleci.com/gh/Patreon/cartographer)
+[![Version](https://img.shields.io/pypi/v/cartographer.svg?style=flat)](http://pypi.python.org/pypi/cartographer)
+[![License](https://img.shields.io/pypi/l/cartographer.svg?style=flat)](http://pypi.python.org/pypi/cartographer)
+[![Python Version](https://img.shields.io/pypi/pyversions/cartographer.svg?style=flat)](http://pypi.python.org/pypi/cartographer)
+
 Python library for using [JSON API](http://jsonapi.org/), especially with [Flask](http://flask.pocoo.org/).
 
 
