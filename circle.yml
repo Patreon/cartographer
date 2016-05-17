@@ -3,6 +3,9 @@ machine:
         version: 3.4.2
 
 dependencies:
+  pre:
+    - pip install --upgrade virtualenv
+    - bash setup_environments.sh
   post:
     - git diff $(git merge-base --octopus origin/master HEAD) | flake8 --diff || exit 1
 
