@@ -103,13 +103,10 @@ class JSONAPISerializer(object):
         ]))
 
     def resource_links_json(self, version):
-        links_json = {
+        return {
             link_name: resource.as_link_json(version)
             for link_name, resource in self.linked_resources().items()
         }
-        if self.resource_url():
-            links_json["self"] = self.resource_url()
-        return links_json
 
     def as_linkage_json(self):
         return {"type": self.resource_type(), "id": self.resource_id_str()}
@@ -182,13 +179,13 @@ class JSONAPISerializer(object):
 
     def document_links_urls(self):
         links = {
+            "self": self.resource_url(),
             "next": self.next_page_url(),
             "prev": self.prev_page_url(),
             "last": self.last_page_url(),
             "first": self.first_page_url()
         }
-        links = {key: value for key, value in links.items() if value}
-        return links
+        return {key: value for key, value in links.items() if value}
 
     def included_resources_key(self, version):
         if version == JSONAPIVersion.JSONAPI_RC2:
