@@ -8,9 +8,14 @@ from cartographer.utils.version import JSONAPIVersion, get_default_version
 
 
 class JSONAPIFlaskRequestMixin(JSONAPIRequestInterface):
+    def get_jsonapi_json(self):
+        force_if_correct_mime = (self.mimetype == 'application/vnd.api+json')
+        return self.get_json(force=force_if_correct_mime)
+
     def get_jsonapi_data(self):
-        if self.json and self.json.get('data'):
-            data = self.json.get('data')
+        sent_json = self.get_jsonapi_json()
+        if sent_json and 'data' in sent_json:
+            data = sent_json.get('data')
         elif self.form and self.form.get('data'):
             data_str = self.form.get('data')
             data = json.loads(data_str)
@@ -69,9 +74,11 @@ class JSONAPIFlaskRequestMixin(JSONAPIRequestInterface):
 
     def get_included(self):
         """Returns a list of the included resources sent from the client"""
-        if not self.json:
+        sent_json = self.get_jsonapi_json()
+        if not sent_json:
             raise DataMissing()
-        return self.json.get('included', [])
+
+        return sent_json.get('included', [])
 
     def get_included_with_filter(self, type_, id_=None):
         included = self.get_included()
