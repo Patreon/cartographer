@@ -13,6 +13,11 @@ class ExampleSerializer(JSONAPISerializer):
     def resource_id(self):
         return str(self._id)
 
+    def resource_url(self):
+        return "http://www.example.com/examples/{}".format(
+            self.resource_id(),
+        )
+
     def attributes_dictionary(self):
         return {
             "title": "an example"
@@ -50,6 +55,9 @@ def test_api_resource():
             "attributes": {
                 "title": "an example"
             }
+        },
+        "links": {
+            "self": "http://www.example.com/examples/1",
         }
     }
     assert_equal(expected_json, resource.as_json_api_document())
@@ -66,7 +74,8 @@ def test_linked_resource():
             },
             "relationships": {
                 "something": {
-                    "data": {"type": "example", "id": "2"}
+                    "data": {"type": "example", "id": "2"},
+                    "related": "http://www.example.com/examples/2",
                 }
             }
         },
@@ -172,17 +181,23 @@ def test_linked_heterogeneous_collection():
                 "attributes": {
                     "title": "an example of linking"
                 },
-                "relationships": {"something": {"data": {"type": "example", "id": "3"}}}
+                "relationships": {
+                    "something": {
+                        "data": {"type": "example", "id": "3"},
+                        "related": "http://www.example.com/examples/3",
+                    },
+                },
             },
             {
                 "type": "example",
                 "id": "3",
                 "attributes": {
                     "title": "an example"
-                }
+                },
             },
         ]
     }
+    assert_equal.__self__.maxDiff = None
     assert_equal(expected_json, resource.as_json_api_document())
 
 
@@ -203,7 +218,12 @@ def test_toplevel_collection():
                 "attributes": {
                     "title": "an example of linking"
                 },
-                "relationships": {"something": {"data": {"type": "example", "id": "3"}}}
+                "relationships": {
+                    "something": {
+                        "data": {"type": "example", "id": "3"},
+                        "related": "http://www.example.com/examples/3",
+                    },
+                },
             },
         ],
         "included": [
@@ -251,7 +271,7 @@ def test_toplevel_collection_with_repeats():
                         {"type": "example", "id": "10"},
                         {"type": "linking_example", "id": "3"}
                     ]}
-                }
+                },
             },
         ],
         "included": [
@@ -262,8 +282,11 @@ def test_toplevel_collection_with_repeats():
                     "title": "an example of linking"
                 },
                 "relationships": {
-                    "something": {"data": {"type": "example", "id": "10"}}
-                }
+                    "something": {
+                        "data": {"type": "example", "id": "10"},
+                        "related": "http://www.example.com/examples/10",
+                    },
+                },
             },
         ]
     }
