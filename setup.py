@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='cartographer',
-      version='0.1.0',
+      version='0.1.1',
       description='Python library for using JSON API, especially with Flask.',
       url='http://github.com/Patreon/cartographer',
       author='Patreon',
