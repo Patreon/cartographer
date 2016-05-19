@@ -75,7 +75,9 @@ def test_linked_resource():
             "relationships": {
                 "something": {
                     "data": {"type": "example", "id": "2"},
-                    "related": "http://www.example.com/examples/2",
+                    "links": {
+                        "related": "http://www.example.com/examples/2",
+                    },
                 }
             }
         },
@@ -184,7 +186,9 @@ def test_linked_heterogeneous_collection():
                 "relationships": {
                     "something": {
                         "data": {"type": "example", "id": "3"},
-                        "related": "http://www.example.com/examples/3",
+                        "links": {
+                            "related": "http://www.example.com/examples/3",
+                        },
                     },
                 },
             },
@@ -221,7 +225,9 @@ def test_toplevel_collection():
                 "relationships": {
                     "something": {
                         "data": {"type": "example", "id": "3"},
-                        "related": "http://www.example.com/examples/3",
+                        "links": {
+                            "related": "http://www.example.com/examples/3",
+                        },
                     },
                 },
             },
@@ -284,7 +290,9 @@ def test_toplevel_collection_with_repeats():
                 "relationships": {
                     "something": {
                         "data": {"type": "example", "id": "10"},
-                        "related": "http://www.example.com/examples/10",
+                        "links": {
+                            "related": "http://www.example.com/examples/10",
+                        },
                     },
                 },
             },

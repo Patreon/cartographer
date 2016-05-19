@@ -136,7 +136,10 @@ class JSONAPISerializer(object):
         else:
             raise ValueError("Unknown JSON API version")
 
-        link_json.update(self.relationship_urls_json(version))
+        links = self.relationship_urls_json(version)
+        if links:
+            link_json['links'] = links
+
         meta = self.meta()
         if meta is not None:
             link_json["meta"] = meta
