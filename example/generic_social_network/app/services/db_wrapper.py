@@ -30,11 +30,11 @@ def build_if_needed(db):
         db.create_all()
 
 
-def drop_users(db):
+def drop_people(db):
     from generic_social_network.app.models.tables.follow import Follow
     from generic_social_network.app.models.tables.post import Post
-    from generic_social_network.app.models.tables.user import User
-    User.drop(db.engine, checkfirst=True)
+    from generic_social_network.app.models.tables.person import Person
+    Person.drop(db.engine, checkfirst=True)
     Follow.drop(db.engine, checkfirst=True)
     Post.drop(db.engine, checkfirst=True)
 
@@ -47,11 +47,6 @@ def drop_posts(db):
 def drop_follows(db):
     from generic_social_network.app.models.tables.follow import Follow
     Follow.drop(db.engine, checkfirst=True)
-
-
-def drop_user_read_history(db):
-    from generic_social_network.app.models.tables.user_read_history import UserReadHistory
-    UserReadHistory.drop(db.engine, checkfirst=True)
 
 
 def reset(db):

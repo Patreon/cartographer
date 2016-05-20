@@ -2,24 +2,22 @@
 from cartographer.serializers import JSONAPICollectionSerializer
 from flask import jsonify, abort, Blueprint, request, session
 from generic_social_network.app import db
-from generic_social_network.app.models.query_builders.user_read_history_dbm import UserReadHistoryDBM
 from generic_social_network.app.models.query_builders.posts_dbm import PostsDBM
-from generic_social_network.app.models.query_builders.users_dbm import UsersDBM
+from generic_social_network.app.models.query_builders.people_dbm import PeopleDBM
 
 from generic_social_network.app.models.query_builders.follows_dbm import FollowsDBM
 from generic_social_network.app.resources.post_resource import PostSerializer
 
 news_feed_blueprint = Blueprint('news_feed_blueprint', __name__)
 follows_dbm = FollowsDBM(db)
-users_dbm = UsersDBM(db)
+people_dbm = PeopleDBM(db)
 posts_dbm = PostsDBM(db)
-user_read_history_dbm = UserReadHistoryDBM(db)
 
 
-@news_feed_blueprint.route('/news_feed/<int:user_id>', methods=['GET'])
-def read_news_feed(user_id):
-    user = get_user_or_404(user_id)
-    posts = posts_dbm.find_posts_for_follower(user_id)
+@news_feed_blueprint.route('/news_feed/<int:person_id>', methods=['GET'])
+def read_news_feed(person_id):
+    person = get_person_or_404(person_id)
+    posts = posts_dbm.find_posts_for_follower(person_id)
     return jsonify(JSONAPICollectionSerializer([
         PostSerializer(
             post,
@@ -30,9 +28,8 @@ def read_news_feed(user_id):
     ]).as_json_api_document())
 
 
-def get_user_or_404(post_id):
-    user = users_dbm.find_by_id(post_id)
-    if user is None:
+def get_person_or_404(post_id):
+    person = people_dbm.find_by_id(post_id)
+    if person is None:
         abort(404)
-    return user
-
+    return person

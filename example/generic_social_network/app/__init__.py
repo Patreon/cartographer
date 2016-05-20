@@ -12,10 +12,10 @@ db = db_wrapper.connect(my_app)
 db_wrapper.build_if_needed(db)
 
 # set up routing & controllers
-from .controllers import users_controller, posts_controller, follows_controller, news_feed_controller, \
+from .controllers import people_controller, posts_controller, follows_controller, news_feed_controller, \
     test_data_controller
 
-my_app.register_blueprint(users_controller.users_blueprint)
+my_app.register_blueprint(people_controller.people_blueprint)
 my_app.register_blueprint(posts_controller.posts_blueprint)
 my_app.register_blueprint(follows_controller.follows_blueprint)
 my_app.register_blueprint(news_feed_controller.news_feed_blueprint)

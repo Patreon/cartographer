@@ -19,8 +19,8 @@ class FollowSchema(Schema):
         'type': 'follow',
         'id': StringAttribute(serializer_method='follow_id'),
         'relationships': {
-            'follower': SchemaRelationship(model_type='user', id_attribute='follower_id'),
-            'followed': SchemaRelationship(model_type='user', id_attribute='followed_id')
+            'follower': SchemaRelationship(model_type='person', id_attribute='follower_id'),
+            'followed': SchemaRelationship(model_type='person', id_attribute='followed_id')
         }
     }
 

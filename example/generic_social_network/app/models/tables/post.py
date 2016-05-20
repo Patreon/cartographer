@@ -8,6 +8,6 @@ class Post(db.Model):
     __tablename__ = 'posts'
 
     post_id = Column(Integer, primary_key=True, nullable=False)
-    author_id = Column(Integer, ForeignKey("users.user_id"), index=True, nullable=False)
+    author_id = Column(Integer, ForeignKey("people.person_id"), index=True, nullable=False)
     title = Column(String(512), default='')
     body = Column(Text)

@@ -3,12 +3,12 @@ from cartographer.serializers import JSONAPICollectionSerializer
 from flask import jsonify, abort, request, Blueprint
 from generic_social_network.app import db
 from generic_social_network.app.models.query_builders.posts_dbm import PostsDBM
-from generic_social_network.app.models.query_builders.users_dbm import UsersDBM
+from generic_social_network.app.models.query_builders.people_dbm import PeopleDBM
 from generic_social_network.app.resources.post_resource import PostSerializer, PostParser
 
 posts_blueprint = Blueprint('posts_blueprint', __name__)
 posts_dbm = PostsDBM(db)
-users_dbm = UsersDBM(db)
+people_dbm = PeopleDBM(db)
 
 
 @posts_blueprint.route('/posts/<int:post_id>', methods=['POST', 'GET', 'PUT', 'DELETE'])

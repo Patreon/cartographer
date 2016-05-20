@@ -23,7 +23,7 @@ class PostSchema(Schema):
             'body': StringAttribute('body'),
         },
         'relationships': {
-            'author': SchemaRelationship(model_type='user', id_attribute='author_id')
+            'author': SchemaRelationship(model_type='person', id_attribute='author_id')
         }
     }
 

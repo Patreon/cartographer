@@ -26,10 +26,10 @@ class PostsDBM:
     def find_by_author_id(self, author_id):
         return Post.query.filter_by(author_id=author_id).all()
 
-    def find_posts_for_follower(self, user_id):
+    def find_posts_for_follower(self, person_id):
         return Post.query \
             .join(Follow, Post.author_id == Follow.followed_id) \
-            .filter(Follow.follower_id == user_id) \
+            .filter(Follow.follower_id == person_id) \
             .all()
 
     def create_from_json(self, json):

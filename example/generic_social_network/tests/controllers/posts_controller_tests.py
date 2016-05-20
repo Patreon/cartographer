@@ -17,7 +17,7 @@ class PostsControllerTestCase(ControllerTestCase):
                     'author': {
                         'data': {
                             'id': str(author_id),
-                            'type': 'user'
+                            'type': 'person'
                         }
                     }
                 }
@@ -27,7 +27,7 @@ class PostsControllerTestCase(ControllerTestCase):
     def default_author_json(self, author_id=1):
         return {
             'data': {
-                'type': 'user',
+                'type': 'person',
                 'id': str(author_id),
                 'attributes': {
                     'name': 'Jane Doe'
@@ -36,7 +36,7 @@ class PostsControllerTestCase(ControllerTestCase):
         }
 
     def make_an_author(self, author_id=1):
-        return self.app.post('/users/{0}'.format(author_id),
+        return self.app.post('/people/{0}'.format(author_id),
                              data=json.dumps(self.default_author_json(author_id)),
                              content_type='application/json')
 
@@ -127,7 +127,7 @@ class PostsControllerTestCase(ControllerTestCase):
         self.make_an_author_and_post(author_id=author_id, post_id=post_id)
         post_data = self.default_post_json(post_id)
 
-        # delete made user
+        # delete made person
         delete_response = self.app.delete('/posts/{0}'.format(post_id))
         expected_response = deepcopy(post_data)
         expected_response.update({'included': [self.default_author_json()['data']]})
@@ -163,12 +163,12 @@ class PostsControllerTestCase(ControllerTestCase):
         get_response = self.app.get('/posts/{0}'.format(post_id))
         self.check_jsonapi_response(get_response, 200, expected_response)
 
-    def test_update_invalid_user(self):
+    def test_update_invalid_person(self):
         author_id = 1
         post_id = 1
         self.make_an_author_and_post(author_id=author_id, post_id=post_id)
 
-        # modify the user in an invalid way (missing author id)
+        # modify the person in an invalid way (missing author id)
         post_data = self.default_post_json(post_id)
         del post_data['data']['relationships']['author']['data']['id']
         update_response = self.app.put('/posts/{0}'.format(post_id), data=json.dumps(post_data),
@@ -182,7 +182,7 @@ class PostsControllerTestCase(ControllerTestCase):
         expected_response.update({'included': [self.default_author_json()['data']]})
         self.check_jsonapi_response(get_response, 200, expected_response)
 
-    def test_update_nonexistant_user(self):
+    def test_update_nonexistant_person(self):
         # without post body data
         response = self.app.put('/posts/999')
         self.check_response(response, 400, None)

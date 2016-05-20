@@ -3,13 +3,13 @@ from flask.sessions import SessionMixin, SecureCookieSessionInterface
 
 
 class MySession(dict, SessionMixin, JSONAPISessionInterface):
-    def __init__(self, user_id=None, **kwargs):
+    def __init__(self, person_id=None, **kwargs):
         super().__init__(**kwargs)
-        self['user_id'] = user_id
+        self['person_id'] = person_id
 
     @property
-    def user_id(self):
-        return self['user_id']
+    def person_id(self):
+        return self['person_id']
 
 
 class MySessionInterface(SecureCookieSessionInterface):

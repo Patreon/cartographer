@@ -26,18 +26,18 @@ class TestData(object):
     def __init__(self, app):
         self.app = app.test_client()
 
-    def make_a_user(self, id_=1):
-        user_json = {
+    def make_a_person(self, id_=1):
+        person_json = {
             'data': {
-                'type': 'user',
+                'type': 'person',
                 'id': id_,
                 'attributes': {
                     'name': 'Jane Doe'
                 }
             }
         }
-        return self.app.post('/users/{0}'.format(id_),
-                             data=json.dumps(user_json),
+        return self.app.post('/people/{0}'.format(id_),
+                             data=json.dumps(person_json),
                              content_type='application/json')
 
     def make_a_post(self, post_id=1, author_id=1):
@@ -52,7 +52,7 @@ class TestData(object):
                 'relationships': {
                     'author': {
                         'data': {
-                            'type': 'user',
+                            'type': 'person',
                             'id': author_id
                         }
                     }
@@ -66,11 +66,11 @@ class TestData(object):
     def make_a_follow(self, follower_id, followed_id):
         return self.app.post('/follows/{0}/{1}'.format(follower_id, followed_id))
 
-    def make_a_reasonable_newsfeed(self, user_id=1, author_ids=[20, 30]):
-        self.make_a_user(user_id)
+    def make_a_reasonable_newsfeed(self, person_id=1, author_ids=[20, 30]):
+        self.make_a_person(person_id)
         for author_id in author_ids:
-            self.make_a_user(author_id)
+            self.make_a_person(author_id)
             for i in range(3):
                 post_id = pow(author_id, i + 1)
                 self.make_a_post(post_id=post_id, author_id=author_id)
-            self.make_a_follow(user_id, author_id)
+            self.make_a_follow(person_id, author_id)

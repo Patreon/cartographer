@@ -3,12 +3,12 @@ from cartographer.serializers import JSONAPICollectionSerializer
 from flask import jsonify, abort, request, Blueprint
 from generic_social_network.app import db
 from generic_social_network.app.models.query_builders.follows_dbm import FollowsDBM
-from generic_social_network.app.models.query_builders.users_dbm import UsersDBM
+from generic_social_network.app.models.query_builders.people_dbm import PeopleDBM
 from generic_social_network.app.resources.follow_resource import FollowSerializer
 
 follows_blueprint = Blueprint('follows_blueprint', __name__)
 follows_dbm = FollowsDBM(db)
-users_dbm = UsersDBM(db)
+people_dbm = PeopleDBM(db)
 
 
 @follows_blueprint.route('/follows/<follower_id>/<followed_id>', methods=['POST', 'GET', 'DELETE'])
@@ -54,9 +54,9 @@ def create_follow(request_, follower_id, followed_id):
         abort(409,
               '{0} with follower id {1} and followed id {2} already exists'.format('follow', follower_id, followed_id))
 
-    if users_dbm.find_by_id(follower_id) is None:
+    if people_dbm.find_by_id(follower_id) is None:
         abort(404)
-    if users_dbm.find_by_id(followed_id) is None:
+    if people_dbm.find_by_id(followed_id) is None:
         abort(404)
 
     follows_dbm.create_with_ids(follower_id, followed_id)
