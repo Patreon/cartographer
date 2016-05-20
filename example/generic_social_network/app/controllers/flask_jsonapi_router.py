@@ -18,9 +18,9 @@ class FlaskJSONAPIRouter(MethodView):
                     self.id_for_model(model)
                 ))
 
-        json = self.get_validated_inbound_model(None, model_found_behavior)
+        table_data = self.get_validated_inbound_model(None, model_found_behavior)
 
-        model_id = self.MODEL_CREATE(json)
+        model_id = self.create_model(table_data, request=request, session=session)
         model = self.RESOURCE.MODEL_GET(model_id)
         return self.success_with_model(model), 201
 
@@ -37,10 +37,10 @@ class FlaskJSONAPIRouter(MethodView):
             # elif not self.RESOURCE.MASK.can_edit(model, session.user_id):
             #     abort(403)
 
-        json = self.get_validated_inbound_model(model_id, model_found_behavior)
+        table_data = self.get_validated_inbound_model(model_id, model_found_behavior)
 
-        self.MODEL_UPDATE(json)
-        model_id = self.id_from_table_data(json)
+        self.update_model(table_data, request=request, session=session)
+        model_id = self.id_from_table_data(table_data)
         model = self.get_model_or_error(model_id)
         return self.success_with_model(model)
 
@@ -48,7 +48,7 @@ class FlaskJSONAPIRouter(MethodView):
         model = self.get_model_or_error(model_id, 409)
         # if not self.RESOURCE.MASK.can_delete(model, session.user_id):
         #     abort(403)
-        self.MODEL_DELETE(model_id)
+        self.delete_model(model_id, request=request, session=session)
         return jsonify({}), 204
 
     def read(self, model_id):
@@ -60,7 +60,7 @@ class FlaskJSONAPIRouter(MethodView):
     def list(self):
         # if not self.RESOURCE.MASK.can_list(session.user_id):
         #     abort(403)
-        all_models = self.MODEL_LIST()
+        all_models = self.list_models(request=request, session=session)
         return jsonify(JSONAPICollectionSerializer([
             self.RESOURCE.SERIALIZER(
                 model,

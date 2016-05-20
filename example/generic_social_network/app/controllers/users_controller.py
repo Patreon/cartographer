@@ -12,9 +12,18 @@ users_dbm = UsersDBM(db)
 
 class UserRouter(FlaskJSONAPIRouter):
     RESOURCE = UserResource
-    MODEL_CREATE = users_dbm.create_from_json
-    MODEL_UPDATE = users_dbm.update_from_json
-    MODEL_DELETE = users_dbm.delete_by_id
-    MODEL_LIST = users_dbm.all
+
+    def create_model(self, table_data, request=None, session=None):
+        return users_dbm.create_from_json(table_data)
+
+    def update_model(self, table_data, request=None, session=None):
+        return users_dbm.update_from_json(table_data)
+
+    def delete_model(self, model_id, request=None, session=None):
+        return users_dbm.delete_by_id(model_id)
+
+    def list_models(self, request=None, session=None):
+        return users_dbm.all
+
 
 UserRouter.register_router(users_blueprint)

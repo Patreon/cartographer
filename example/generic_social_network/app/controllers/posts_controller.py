@@ -12,9 +12,18 @@ posts_dbm = PostsDBM(db)
 
 class PostRouter(FlaskJSONAPIRouter):
     RESOURCE = PostResource
-    MODEL_CREATE = posts_dbm.create_from_json
-    MODEL_UPDATE = posts_dbm.update_from_json
-    MODEL_DELETE = posts_dbm.delete_by_id
-    MODEL_LIST = posts_dbm.all
+
+    def create_model(self, table_data, request=None, session=None):
+        return posts_dbm.create_from_json(table_data)
+
+    def update_model(self, table_data, request=None, session=None):
+        return posts_dbm.update_from_json(table_data)
+
+    def delete_model(self, model_id, request=None, session=None):
+        return posts_dbm.delete_by_id(model_id)
+
+    def list_models(self, request=None, session=None):
+        return posts_dbm.all
+
 
 PostRouter.register_router(posts_blueprint)
