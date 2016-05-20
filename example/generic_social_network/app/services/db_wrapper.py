@@ -32,16 +32,16 @@ def build_if_needed(db):
 
 def drop_people(db):
     from generic_social_network.app.models.tables.follow import Follow
-    from generic_social_network.app.models.tables.post import Post
+    from generic_social_network.app.models.tables.article import Article
     from generic_social_network.app.models.tables.person import Person
     Person.drop(db.engine, checkfirst=True)
     Follow.drop(db.engine, checkfirst=True)
-    Post.drop(db.engine, checkfirst=True)
+    Article.drop(db.engine, checkfirst=True)
 
 
-def drop_posts(db):
-    from generic_social_network.app.models.tables.post import Post
-    Post.drop(db.engine, checkfirst=True)
+def drop_articles(db):
+    from generic_social_network.app.models.tables.article import Article
+    Article.drop(db.engine, checkfirst=True)
 
 
 def drop_follows(db):

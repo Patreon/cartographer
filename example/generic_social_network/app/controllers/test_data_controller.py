@@ -40,13 +40,13 @@ class TestData(object):
                              data=json.dumps(person_json),
                              content_type='application/json')
 
-    def make_a_post(self, post_id=1, author_id=1):
-        post_json = {
+    def make_a_article(self, article_id=1, author_id=1):
+        article_json = {
             'data': {
-                'type': 'post',
-                'id': post_id,
+                'type': 'article',
+                'id': article_id,
                 'attributes': {
-                    'title': 'An Inspirational Blog Post',
+                    'title': 'An Inspirational Blog Article',
                     'body': 'Be yourself, but also you can change for the better.'
                 },
                 'relationships': {
@@ -59,8 +59,8 @@ class TestData(object):
                 }
             }
         }
-        return self.app.post('/posts/{0}'.format(post_id),
-                             data=json.dumps(post_json),
+        return self.app.post('/articles/{0}'.format(article_id),
+                             data=json.dumps(article_json),
                              content_type='application/json')
 
     def make_a_follow(self, follower_id, followed_id):
@@ -71,6 +71,6 @@ class TestData(object):
         for author_id in author_ids:
             self.make_a_person(author_id)
             for i in range(3):
-                post_id = pow(author_id, i + 1)
-                self.make_a_post(post_id=post_id, author_id=author_id)
+                article_id = pow(author_id, i + 1)
+                self.make_a_article(article_id=article_id, author_id=author_id)
             self.make_a_follow(person_id, author_id)

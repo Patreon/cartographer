@@ -17,13 +17,13 @@ class NewsFeedControllerTestCase(ControllerTestCase):
                              data=json.dumps(person_json),
                              content_type='application/json')
 
-    def make_a_post(self, post_id=1, author_id=1):
-        post_json = {
+    def make_a_article(self, article_id=1, author_id=1):
+        article_json = {
             'data': {
-                'id': str(post_id),
-                'type': 'post',
+                'id': str(article_id),
+                'type': 'article',
                 'attributes': {
-                    'title': 'An Inspirational Blog Post',
+                    'title': 'An Inspirational Blog Article',
                     'body': 'Be yourself, but also you can change for the better.'
                 },
                 'relationships': {
@@ -36,8 +36,8 @@ class NewsFeedControllerTestCase(ControllerTestCase):
                 }
             }
         }
-        return self.app.post('/posts/{0}'.format(post_id),
-                             data=json.dumps(post_json),
+        return self.app.post('/articles/{0}'.format(article_id),
+                             data=json.dumps(article_json),
                              content_type='application/json')
 
     def make_a_follow(self, follower_id, followed_id):
@@ -48,8 +48,8 @@ class NewsFeedControllerTestCase(ControllerTestCase):
         for author_id in author_ids:
             self.make_a_person(author_id)
             for i in range(3):
-                post_id = author_id + i
-                self.make_a_post(post_id=post_id, author_id=author_id)
+                article_id = author_id + i
+                self.make_a_article(article_id=article_id, author_id=author_id)
             self.make_a_follow(person_id, author_id)
 
     def test_get_news_feed(self):
@@ -60,28 +60,28 @@ class NewsFeedControllerTestCase(ControllerTestCase):
         get_response = self.app.get('/news_feed/{0}'.format(id_))
         expected_response = {
             'data': [
-                {'id': '20', 'type': 'post',
-                 'attributes': {'title': 'An Inspirational Blog Post',
+                {'id': '20', 'type': 'article',
+                 'attributes': {'title': 'An Inspirational Blog Article',
                                 'body': 'Be yourself, but also you can change for the better.'},
                  'relationships': {'author': {'data': {'id': '20', 'type': 'person'}}}},
-                {'id': '21', 'type': 'post',
-                 'attributes': {'title': 'An Inspirational Blog Post',
+                {'id': '21', 'type': 'article',
+                 'attributes': {'title': 'An Inspirational Blog Article',
                                 'body': 'Be yourself, but also you can change for the better.'},
                  'relationships': {'author': {'data': {'id': '20', 'type': 'person'}}}},
-                {'id': '22', 'type': 'post',
-                 'attributes': {'title': 'An Inspirational Blog Post',
+                {'id': '22', 'type': 'article',
+                 'attributes': {'title': 'An Inspirational Blog Article',
                                 'body': 'Be yourself, but also you can change for the better.'},
                  'relationships': {'author': {'data': {'id': '20', 'type': 'person'}}}},
-                {'id': '30', 'type': 'post',
-                 'attributes': {'title': 'An Inspirational Blog Post',
+                {'id': '30', 'type': 'article',
+                 'attributes': {'title': 'An Inspirational Blog Article',
                                 'body': 'Be yourself, but also you can change for the better.'},
                  'relationships': {'author': {'data': {'id': '30', 'type': 'person'}}}},
-                {'id': '31', 'type': 'post',
-                 'attributes': {'title': 'An Inspirational Blog Post',
+                {'id': '31', 'type': 'article',
+                 'attributes': {'title': 'An Inspirational Blog Article',
                                 'body': 'Be yourself, but also you can change for the better.'},
                  'relationships': {'author': {'data': {'id': '30', 'type': 'person'}}}},
-                {'id': '32', 'type': 'post',
-                 'attributes': {'title': 'An Inspirational Blog Post',
+                {'id': '32', 'type': 'article',
+                 'attributes': {'title': 'An Inspirational Blog Article',
                                 'body': 'Be yourself, but also you can change for the better.'},
                  'relationships': {'author': {'data': {'id': '30', 'type': 'person'}}}}
             ],

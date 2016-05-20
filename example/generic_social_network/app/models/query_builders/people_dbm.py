@@ -1,6 +1,6 @@
 from generic_social_network.app.models.tables.person import Person
 from .follows_dbm import FollowsDBM
-from .posts_dbm import PostsDBM
+from .articles_dbm import ArticlesDBM
 
 
 class PeopleDBM:
@@ -36,4 +36,4 @@ class PeopleDBM:
         self.db.session.commit()
         FollowsDBM(self.db).delete_matching_follower_id(person_id)
         FollowsDBM(self.db).delete_matching_followed_id(person_id)
-        PostsDBM(self.db).delete_matching_author_id(person_id)
+        ArticlesDBM(self.db).delete_matching_author_id(person_id)
