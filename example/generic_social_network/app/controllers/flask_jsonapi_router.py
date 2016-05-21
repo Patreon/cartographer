@@ -1,28 +1,32 @@
 from flask import abort, jsonify, request, session
 from flask.views import MethodView
-
 from cartographer.serializers import JSONAPICollectionSerializer
+
+from .flask_jsonapi_route_decorators import parse_inbound_jsonapi_request, find_prior_model, \
+    serialize_outbound_jsonapi_response
 
 
 class FlaskJSONAPIRouter(MethodView):
     APP = None
 
     def post(self):
-        # if not self.RESOURCE.MASK.can_create(session.user_id):
-        #     abort(403)
+        @parse_inbound_jsonapi_request(self.RESOURCE, 'POST')
+        @find_prior_model(self.RESOURCE)
+        @serialize_outbound_jsonapi_response(self.RESOURCE, 'POST')
+        def inner_post(table_data=None, model_id=None, prior_model=None):
+            # if not self.RESOURCE.MASK.can_create(session.user_id):
+            #     abort(403)
 
-        def model_found_behavior(model):
-            if model is not None:
+            if prior_model is not None:
                 abort(409, '{0} with id {1} already exists'.format(
                     self.RESOURCE.type_string(),
-                    self.id_for_model(model)
+                    model_id
                 ))
 
-        table_data = self.get_validated_inbound_model(None, model_found_behavior)
+            model_id = self.create_model(table_data, inbound_request=request, inbound_session=session)
+            return self.RESOURCE.MODEL_GET(model_id)
 
-        model_id = self.create_model(table_data, inbound_request=request, inbound_session=session)
-        model = self.RESOURCE.MODEL_GET(model_id)
-        return self.success_with_model(model), 201
+        return inner_post()
 
     def get(self, model_id):
         if model_id is None:
@@ -31,31 +35,44 @@ class FlaskJSONAPIRouter(MethodView):
             return self.read(model_id)
 
     def put(self, model_id):
-        def model_found_behavior(model):
-            if model is None:
+        @parse_inbound_jsonapi_request(self.RESOURCE, 'PUT')
+        @find_prior_model(self.RESOURCE)
+        @serialize_outbound_jsonapi_response(self.RESOURCE, 'PUT')
+        def inner_put(table_data=None, model_id=None, prior_model=None):
+            if prior_model is None:
                 abort(404)
-            # elif not self.RESOURCE.MASK.can_edit(model, session.user_id):
+            # elif not self.RESOURCE.MASK.can_edit(prior_model, session.user_id):
             #     abort(403)
 
-        table_data = self.get_validated_inbound_model(model_id, model_found_behavior)
+            self.update_model(table_data, inbound_request=request, inbound_session=session)
+            return self.RESOURCE.MODEL_GET(model_id)
 
-        self.update_model(table_data, inbound_request=request, inbound_session=session)
-        model_id = self.id_from_table_data(table_data)
-        model = self.get_model_or_error(model_id)
-        return self.success_with_model(model)
+        return inner_put(model_id=model_id)
 
     def delete(self, model_id):
-        model = self.get_model_or_error(model_id, 409)
-        # if not self.RESOURCE.MASK.can_delete(model, session.user_id):
-        #     abort(403)
-        self.delete_model(model_id, inbound_request=request, inbound_session=session)
-        return jsonify({}), 204
+        @find_prior_model(self.RESOURCE)
+        @serialize_outbound_jsonapi_response(self.RESOURCE, 'DELETE')
+        def inner_delete(model_id=None, prior_model=None):
+            # if not self.RESOURCE.MASK.can_delete(prior_model, session.user_id):
+            #     abort(403)
+            if not prior_model:
+                abort(409)
+            self.delete_model(model_id, inbound_request=request, inbound_session=session)
+            return None
+
+        return inner_delete(model_id=model_id)
 
     def read(self, model_id):
-        model = self.get_model_or_error(model_id)
-        # if not self.RESOURCE.MASK.can_view(model, session.user_id):
-        #     abort(403)
-        return self.success_with_model(model)
+        @find_prior_model(self.RESOURCE)
+        @serialize_outbound_jsonapi_response(self.RESOURCE, 'GET')
+        def inner_read(model_id=None, prior_model=None):
+            # if not self.RESOURCE.MASK.can_view(model, session.user_id):
+            #     abort(403)
+            if prior_model is None:
+                abort(404)
+            return prior_model
+
+        return inner_read(model_id=model_id)
 
     def list(self):
         # if not self.RESOURCE.MASK.can_list(session.user_id):
@@ -68,61 +85,7 @@ class FlaskJSONAPIRouter(MethodView):
                 inbound_session=session
             )
             for model in all_models
-        ]).as_json_api_document())
-
-    def get_model_or_error(self, model_id, error_code=404):
-        model = self.RESOURCE.MODEL_GET(model_id)
-        if model is None:
-            abort(error_code)
-        return model
-
-    def success_with_model(self, model):
-        return jsonify(self.RESOURCE.SERIALIZER(
-            model,
-            inbound_request=request,
-            inbound_session=session
-        ).as_json_api_document())
-
-    def get_validated_inbound_model(self, model_id, model_found_behavior):
-        table_data = None
-        try:
-            table_data = self.RESOURCE.PARSER(inbound_request=request).validated_table_data()
-        except Exception as e:
-            abort(400, ', '.join(e.args))
-        table_data = self.standardize_ids_or_abort(table_data, model_id)
-        model_id = self.id_from_table_data(table_data)
-        model = None
-        if model_id:
-            model = self.RESOURCE.MODEL_GET(model_id)
-        model_found_behavior(model)
-        return table_data
-
-    def standardize_ids_or_abort(self, json, model_id):
-        if not json:
-            abort(400, 'No {} data was provided in your request'.format(
-                self.RESOURCE.type_string()
-            ))
-        id_key = self.key_for_id_in_table_data()
-        if id_key in json and model_id:
-            if model_id != json[id_key]:
-                abort(400, 'Provided {} object had a id that did not match the provided route'.format(
-                    self.RESOURCE.type_string()
-                ))
-        elif model_id:
-            json[self.key_for_id_in_table_data()] = model_id
-        return json
-
-    @classmethod
-    def key_for_id_in_table_data(cls):
-        return cls.RESOURCE.SCHEMA.resource_id().model_attribute
-
-    @classmethod
-    def id_from_table_data(cls, table_data):
-        return table_data.get(cls.key_for_id_in_table_data())
-
-    @classmethod
-    def id_for_model(cls, model):
-        return cls.RESOURCE.SERIALIZER(model).resource_id()
+        ]).as_json_api_document()), 200
 
     @classmethod
     def register_router(cls, app):
