@@ -33,7 +33,8 @@ class UsersControllerTestCase(ControllerTestCase):
         response = self.app.get('/users/999')
         self.check_response(response, 404,
                             {
-                                'error': 'The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.'})
+                                'error': ("The requested URL was not found on the server."
+                                "  If you entered the URL manually please check your spelling and try again.")})
 
     def test_create_valid_user(self):
         id_ = 1
@@ -77,13 +78,15 @@ class UsersControllerTestCase(ControllerTestCase):
         response = self.app.get('/users/{0}'.format(id_))
         self.check_response(response, 404,
                             {
-                                'error': 'The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.'})
+                                'error': ("The requested URL was not found on the server."
+                                "  If you entered the URL manually please check your spelling and try again.")})
 
     def test_delete_nonexistant_user(self):
         response = self.app.delete('/users/999')
         self.check_response(response, 409,
                             {
-                                'error': 'A conflict happened while processing the request.  The resource might have been modified while the request was being processed.'})
+                                'error': ("A conflict happened while processing the request."
+                                "  The resource might have been modified while the request was being processed.")})
 
     def test_update_user(self):
         id_ = 1
@@ -128,7 +131,8 @@ class UsersControllerTestCase(ControllerTestCase):
         response = self.app.put('/users/{0}'.format(id_), data=json.dumps(post_data), content_type='application/json')
         self.check_response(response, 404,
                             {
-                                'error': 'The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.'})
+                                'error': ("The requested URL was not found on the server."
+                                "  If you entered the URL manually please check your spelling and try again.")})
 
 
 suite = UsersControllerTestCase.suite()
