@@ -8,6 +8,7 @@ dependencies:
     - bash setup_environments.sh
   post:
     - git diff $(git merge-base --octopus origin/master HEAD) | flake8 --diff || exit 1
+    - rm -r ~/virtualenvs
 
 test:
     override:
