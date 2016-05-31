@@ -63,7 +63,7 @@ The values in the schema are `SchemaAttribute` instances,
 responsible for describing how to translate to and from our Python models.
 
 `SchemaAttribute` is a very simple class, with two primary methods:
-`value`, for serializing from Python into JSON,
+`to_json`, for serializing from Python into JSON,
 and `from_json` for parsing from JSON into Python.
 Subclasses of `SchemaAttribute` can override either of these methods
 to customize (de)serialization behavior.
@@ -84,9 +84,9 @@ The values in the schema are `SchemaRelationship` instances,
 responsible for describing how to translate to and from our Python models.
 
 `SchemaRelationship` is a more complicated class, with only one primary method,
-`resource`, for creating a `JSONAPISerializer` instance based on its input arguments.
+`related_serializer`, for creating a `JSONAPISerializer` instance based on its input arguments.
 Subclasses of `SchemaResource` can override this method
-to customize serialization behavior.
+to customize the `JSONAPISerializer` to be returned.
 Parsing of related resources is handled by the `PostedDocument` class in the Parsers section of this README.
 
 Currently, there is only one subclass of `SchemaRelationship`,
@@ -101,6 +101,13 @@ and overriding the `schema` class method to point to a `Schema` class.
 Should you have a complete `Schema` (as described above),
 then that (plus adding your new `SchemaSerializer` to the [`resource_registry`](#Miscellaneous))
 should be all that's needed to serialize a model into JSON output in your route file / controller.
+For example:
+```python
+class UserSerializer(SchemaSerializer):
+    @classmethod
+    def schema(cls):
+        return UserSchema
+```
 
 But what's really going on behind the scenes?
 To understand `SchemaSerializer`, one must first understand its superclass `JSONAPISerializer`.
@@ -128,6 +135,11 @@ In addition to saving you the work of overriding those four methods for each res
 * But rather than either of those, you should just pass in `inbound_request` and `inbound_session`,
 which `SchemaResource` will use to parse the `requested_fields` and `includes` off of the request object,
 and the `current_user_id` off of the session object for you.
+* Also, each `SchemaSerializer` will initialize each related resource `Serializer`
+with the appropriate query parameter handling, via the `parent_resource` named initialization parameter
+(don't worry, you shouldn't have to worry about this unless you're manually implementing
+a method on a `Serializer` to return a custom related resource `Serializer`
+rather than relying on `SchemaRelationship`s in the `Schema`).
 
 
 Parsers
@@ -137,6 +149,13 @@ Typically, this is done via subclassing `SchemaParser`
 and overriding the `schema` class method to point to a `Schema` class.
 Should you have a complete `Schema` (as described above),
 then that should be all that's needed to parse JSON input from your route file / controller.
+For example:
+```python
+class UserParser(SchemaParser):
+    @classmethod
+    def schema(cls):
+        return UserSchema
+```
 
 But what's really going on behind the scenes?
 To understand `SchemaParser`, one must first understand its superclass `PostedDocument`.
@@ -200,17 +219,16 @@ Resource Registration
 ### `resource_registry`
 
 The `resource_registry` is a map from `type` strings to a dict of:
-* `ResourceRegistryKeys.MODEL`, their corresponding
-model class
-    * `ResourceRegistryKeys.MODEL_GET`, a method for fetching models by id
-    * `ResourceRegistryKeys.MODEL_PRIME`, a method for optimizing future `MODEL_GET` calls
-* `ResourceRegistryKeys.SCHEMA`, their corresponding `Schema` class
-* `ResourceRegistryKeys.SERIALIZER`, their corresponding `SchemaSerializer` class
-* `ResourceRegistryKeys.PARSER`, their corresponding `SchemaParser` class
-* `ResourceRegistryKeys.MASK`, their corresponding `Mask` class
+* `ResourceRegistryKeys.MODEL`, the resource's corresponding model class
+* `ResourceRegistryKeys.MODEL_GET`, a method for fetching models by id
+* `ResourceRegistryKeys.MODEL_PRIME`, a method for optimizing future `MODEL_GET` calls
+* `ResourceRegistryKeys.SCHEMA`, the resource's corresponding `Schema` class
+* `ResourceRegistryKeys.SERIALIZER`, the resource's corresponding `SchemaSerializer` class
+* `ResourceRegistryKeys.PARSER`, the resource's corresponding `SchemaParser` class
+* `ResourceRegistryKeys.MASK`, the resource's corresponding `Mask` class
 
 This map is used under the hood when `SchemaRelationship` instances need to create their related resources,
-and when Serializers and Parsers need to apply masking rules.
+and when `Serializer`s and `Parser`s need to apply `mask`ing rules.
 
 You can add your classes to the registry via
 `cartographer.resource_registry.get_resource_registry_container().register_resource()`,
