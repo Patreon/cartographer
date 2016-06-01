@@ -248,8 +248,7 @@ It has a class properties corresponding to the entries in the `resource_registry
 * `APIResource.MODEL_PRIME`, a method that can be passed an `id` which will improve the performance of future `MODEL_GET` calls
 
 To use this convenience class, you subclass it and either define those class properties
-and then call `MyAPIResourceSubclass.register_class()`
-or use e.g.
+and then use one of `MyAPIResourceSubclass.register_class()`, the `@resource` decorator or use e.g.
 ```python
 @MyAPIResourceSubclass.register(ResourceRegistryKeys.PARSER)
 class MySchemaParserSubclass(SchemaParser):

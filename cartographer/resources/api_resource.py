@@ -6,6 +6,23 @@ from cartographer.schemas.schema import Schema
 from cartographer.serializers import SchemaSerializer
 
 
+def resource(cls):
+    """Can be used as decorator to specify a cartographer resource"""
+    registry = get_resource_registry_container()
+    registry.register_resource(
+        type_string=cls.type_string(),
+        schema=cls.SCHEMA,
+        serializer=cls.SERIALIZER,
+        parser=cls.PARSER,
+        mask=cls.MASK,
+        model=cls.MODEL,
+        model_get=cls.MODEL_GET,
+        model_prime=cls.MODEL_PRIME
+    )
+
+    return cls
+
+
 class APIResource(object):
     SCHEMA = Schema
     SERIALIZER = SchemaSerializer
@@ -45,14 +62,4 @@ class APIResource(object):
 
     @classmethod
     def register_class(cls):
-        registry = get_resource_registry_container()
-        registry.register_resource(
-            type_string=cls.type_string(),
-            schema=cls.SCHEMA,
-            serializer=cls.SERIALIZER,
-            parser=cls.PARSER,
-            mask=cls.MASK,
-            model=cls.MODEL,
-            model_get=cls.MODEL_GET,
-            model_prime=cls.MODEL_PRIME
-        )
+        resource(cls)
