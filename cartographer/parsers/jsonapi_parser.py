@@ -43,21 +43,29 @@ class PostedResource(object):
         self.document = document
 
     def resource_type(self):
-        return self.json_data["type"]
+        return self.json_data.get("type")
+
+    def attributes(self):
+        return self.json_data.get("attributes", {})
 
     def attribute(self, name):
-        return self.json_data.get("attributes", {}).get(name)
+        return self.attributes().get(name)
 
-    def assert_type(self, resource_type):
+    def assert_type(self, resource_type, exception=Exception):
         if self.resource_type() != resource_type:
-            raise Exception("Expected a " + resource_type + ", but got a " + self.resource_type())
+            raise exception("Expected a " + resource_type + ", but got a " + self.resource_type())
+
         return self
 
+    def relationships(self):
+        return self.json_data.get("relationships", {})
+
     def relationship(self, relationship_name):
-        if relationship_name not in self.json_data.get("relationships", {}):
+        relationships = self.relationships()
+        if relationship_name not in relationships:
             return None
 
-        return PostedRelationship(self.json_data["relationships"][relationship_name], self.document)
+        return PostedRelationship(relationships[relationship_name], self.document)
 
     def relationship_id(self, relationship_name):
         relationship = self.relationship(relationship_name)
@@ -86,8 +94,8 @@ class PostedRelationship(object):
 
         if isinstance(relationship_id, list):
             return [one_id.related_resource() for one_id in relationship_id]
-        else:
-            return relationship_id.related_resource()
+
+        return relationship_id.related_resource()
 
 
 class PostedRelationshipID(object):
@@ -102,9 +110,10 @@ class PostedRelationshipID(object):
     def resource_id(self):
         return self.json_data.get("id")
 
-    def assert_type(self, resource_type):
+    def assert_type(self, resource_type, exception=Exception):
         if self.resource_type() != resource_type:
-            raise Exception("Expected a " + resource_type + ", but got a " + self.resource_type())
+            raise exception("Expected a " + resource_type + ", but got a " + self.resource_type())
+
         return self
 
     def related_resource(self):
