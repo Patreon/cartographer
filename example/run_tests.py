@@ -10,4 +10,4 @@ controllers_test_suite = unittest.TestSuite([
     follows_controller_tests.suite,
     news_feed_controller_tests.suite
 ])
-runner.run(controllers_test_suite)
+exit(bool(runner.run(controllers_test_suite).errors))
