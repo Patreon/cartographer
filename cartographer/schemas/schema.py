@@ -8,9 +8,13 @@ class Schema(object):
     ```python
     {
         "type": "widget",
-        "id": StringAttribute("widget_id"),
+        "id": StringAttribute()
+                .read_from(model_property='widget_id')
+                .self_explanatory(),
         "atributes": {
-            "price": IntAttribute("amount_cents")
+            "price": IntAttribute()
+                .read_from(model_property='amount_cents')
+                .description('The price of the widget in cents'),
         },
         "relationships": {
             "manufacturer": SchemaRelationship(

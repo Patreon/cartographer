@@ -17,7 +17,9 @@ class FollowResource(APIResource):
 class FollowSchema(Schema):
     SCHEMA = {
         'type': 'follow',
-        'id': StringAttribute(serializer_method='follow_id'),
+        'id': StringAttribute()
+                .read_from(serializer_method='follow_id')
+                .self_explanatory(),
         'relationships': {
             'follower': SchemaRelationship(model_type='user', id_attribute='follower_id'),
             'followed': SchemaRelationship(model_type='user', id_attribute='followed_id')

@@ -17,9 +17,13 @@ class UserReadHistoryResource(APIResource):
 class UserReadHistorySchema(Schema):
     SCHEMA = {
         'type': 'user-read-history',
-        'id': StringAttribute(serializer_method='user_read_history_id'),
+        'id': StringAttribute()
+                .read_from(serializer_method='user_read_history_id')
+                .self_explanatory(),
         'attributes': {
-            'timestamp': DateAttribute('timestamp')
+            'timestamp': DateAttribute()
+                .read_from(model_property='timestamp')
+                .description('The time the user last read this post'),
         },
         'relationships': {
             'user': SchemaRelationship(model_type='user', id_attribute='user_id'),

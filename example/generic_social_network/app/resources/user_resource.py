@@ -17,9 +17,13 @@ class UserResource(APIResource):
 class UserSchema(Schema):
     SCHEMA = {
         'type': 'user',
-        'id': StringAttribute('user_id'),
+        'id': StringAttribute()
+                .read_from(model_property='user_id')
+                .self_explanatory(),
         'attributes': {
-            'name': StringAttribute('name')
+            'name': StringAttribute()
+                .read_from(model_property='name')
+                .self_explanatory(),
         }
     }
 

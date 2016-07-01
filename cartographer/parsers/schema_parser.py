@@ -107,11 +107,9 @@ class SchemaParser(PostedDocument):
         :return: A tuple of the model property name and its corresponding parsed value
         """
         schema_attribute = self.schema().attribute(key)
-        if schema_attribute \
-                and schema_attribute.model_attribute \
-                and schema_attribute.is_property:
+        if schema_attribute and schema_attribute.model_property:
             serialized_value = self.data().attribute(key)
-            return schema_attribute.model_attribute, schema_attribute.from_json(serialized_value)
+            return schema_attribute.model_property, schema_attribute.from_json(serialized_value)
         # TODO: let SchemaAttribute declare parser_method
 
     def should_parse_attribute(self, key):

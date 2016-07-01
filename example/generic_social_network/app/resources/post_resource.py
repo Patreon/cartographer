@@ -17,10 +17,16 @@ class PostResource(APIResource):
 class PostSchema(Schema):
     SCHEMA = {
         'type': 'post',
-        'id': StringAttribute('post_id'),
+        'id': StringAttribute()
+                .read_from(model_property='post_id')
+                .self_explanatory(),
         'attributes': {
-            'title': StringAttribute('title'),
-            'body': StringAttribute('body'),
+            'title': StringAttribute()
+                .read_from(model_property='title')
+                .description("The post's title text"),
+            'body': StringAttribute()
+                .read_from(model_property='body')
+                .description("The posts's content"),
         },
         'relationships': {
             'author': SchemaRelationship(model_type='user', id_attribute='author_id')
