@@ -113,7 +113,13 @@ class SchemaParser(PostedDocument):
         # TODO: let SchemaAttribute declare parser_method
 
     def should_parse_attribute(self, key):
-        return key in self.schema().attributes()
+        attribute = self.schema().attribute(key)
+        if not attribute:
+            return False
+        if attribute.is_computed:
+            return False
+
+        return True
 
     # Relationships
 
