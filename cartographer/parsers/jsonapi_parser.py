@@ -49,7 +49,7 @@ class PostedResource(object):
         return self.json_data.get("attributes", {})
 
     def attribute(self, name):
-        return self.attributes().get(name)
+        return self.attributes().get(name, None)
 
     def assert_type(self, resource_type, exception=Exception):
         if self.resource_type() != resource_type:
