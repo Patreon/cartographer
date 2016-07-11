@@ -33,7 +33,7 @@ It is formatted to resemble the output structure of JSON API resources:
     "id": StringAttribute()
             .read_from(model_property="widget_id")
             .self_explanatory(),
-    "atributes": {
+    "attributes": {
         "price": IntAttribute()
             .read_from(model_property="amount_cents")
             .description('The wiget price in cents'),
