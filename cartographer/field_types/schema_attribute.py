@@ -102,7 +102,11 @@ class SchemaAttribute(object):
         :return: The value which the json library can serialize,
         which will have been formatted via format_value_for_json
         """
-        return self.format_value_for_json(self.get_value(serializer))
+        value = self.get_value(serializer)
+        if value is None:
+            return value
+
+        return self.format_value_for_json(value)
 
     @classmethod
     def format_value_for_json(cls, value):
