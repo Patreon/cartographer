@@ -22,7 +22,7 @@ class SchemaAttribute(object):
         self.is_optional_on_create = False
         self.is_computed = False
 
-    def read_from(self, model_property=None, model_method=None, serializer_method=None):
+    def read_from(self, *, model_property=None, model_method=None, serializer_method=None):
         """
         Defines how to retrieve the value of the property. Only one parameter is allowed.
 
