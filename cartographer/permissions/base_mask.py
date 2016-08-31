@@ -151,3 +151,7 @@ class BaseMask(object):
         is not allowed to delete or remove from.
         """
         return []
+
+    @classmethod
+    def prime_for_includes(cls, model, user_id):
+        pass
