@@ -56,7 +56,7 @@ class Schema(object):
 
     @classmethod
     def attribute(cls, key):
-        return cls.attributes().get('key')
+        return cls.attributes().get(key)
 
     @classmethod
     def attributes(cls):
