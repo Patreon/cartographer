@@ -47,25 +47,29 @@ class Schema(object):
     # Convenience methods for accessing pieces of the schema.
 
     @classmethod
-    def type(cls):
+    def resource_type(cls):
         return cls.schema().get('type')
 
     @classmethod
-    def id_attribute(cls):
+    def resource_id(cls):
         return cls.schema().get('id')
 
     @classmethod
-    def attribute(cls, key):
-        return cls.attributes().get('key')
-
-    @classmethod
     def attributes(cls):
-        return cls.schema().get('attributes', {})
+        return list(cls.schema().get('attributes', {}).keys())
 
     @classmethod
-    def relationship(cls, key):
-        return cls.relationships().get(key)
+    def attribute(cls, key):
+        return cls.schema().get('attributes', {}).get(key)
 
     @classmethod
     def relationships(cls):
-        return cls.schema().get('relationships', {})
+        return list(cls.schema().get('relationships', {}).keys())
+
+    @classmethod
+    def relationship(cls, key):
+        return cls.schema().get('relationships', {}).get(key)
+
+    @classmethod
+    def schema_lookup(cls, json_key):
+        return cls.schema().get(json_key)
