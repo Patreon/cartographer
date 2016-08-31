@@ -47,7 +47,7 @@ class Schema(object):
     # Convenience methods for accessing pieces of the schema.
 
     @classmethod
-    def type(cls):
+    def resource_type(cls):
         return cls.schema().get('type')
 
     @classmethod
