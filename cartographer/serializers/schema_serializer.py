@@ -175,6 +175,8 @@ class SchemaSerializer(JSONAPISerializer):
         so that when a node eventually performs the query, it can perform all the queries together
         (via our `https://github.com/Patreon/flask-caching-services` `MultigetCache` wrapper)
         """
+        self.mask_class().prime_for_includes(self.model, self.current_user_id)
+
         relationship_keys = self.schema().relationships()
         if relationship_keys:
             for key in relationship_keys:
