@@ -6,3 +6,4 @@ from .date_attribute import DateAttribute
 from .int_attribute import IntAttribute
 from .json_attribute import JSONAttribute
 from .string_attribute import StringAttribute
+from .enum_attribute import EnumAttribute

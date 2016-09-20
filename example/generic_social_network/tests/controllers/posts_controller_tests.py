@@ -11,7 +11,8 @@ class PostsControllerTestCase(ControllerTestCase):
                 'type': 'post',
                 'attributes': {
                     'title': 'An Inspirational Blog Post',
-                    'body': 'Be yourself, but also you can change for the better.'
+                    'body': 'Be yourself, but also you can change for the better.',
+                    'type': 'text',
                 },
                 'relationships': {
                     'author': {
