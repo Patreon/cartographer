@@ -8,8 +8,13 @@ class JSONAPICollectionSerializer(JSONAPISerializer):
     homogeneous_type = None
     links = {}
 
-    def __init__(self, members=[], links={}):
-        self._members = list(members) if members else members
+    def __init__(self, members=None, links=None):
+        if members is None:
+            members = []
+        if links is None:
+            links = {}
+
+        self._members = members
         self.links = links
 
     def members(self):
