@@ -96,6 +96,12 @@ class SchemaParser(PostedDocument):
             self._table_data = result
         return self._table_data
 
+    def meta(self):
+        """
+        :return: Dictionary of all meta attributes
+        """
+        return self.json_data.get('meta', {})
+
     # Attributes
 
     def parse_schema_attribute(self, key):
