@@ -6,7 +6,18 @@ from cartographer.schemas.schema import Schema
 from cartographer.serializers import SchemaSerializer
 
 
-class APIResource(object):
+class APIResourceMetaClass(type):
+    @classmethod
+    def register_class(cls):
+        raise NotImplementedError
+
+    def __new__(mcs, name, bases, dct):
+        cls = super().__new__(mcs, name, bases, dct)
+        cls.register_class()
+        return cls
+
+
+class APIResource(metaclass=APIResourceMetaClass):
     SCHEMA = Schema
     SERIALIZER = SchemaSerializer
     PARSER = SchemaParser
@@ -45,6 +56,11 @@ class APIResource(object):
 
     @classmethod
     def register_class(cls):
+        # Hack to prevent APIResource from registering itself
+        # Since during creation of APIResource we have nothing else to judge against its... uncreated self.
+        if cls.__bases__ == (object, ):
+            return
+
         registry = get_resource_registry_container()
         registry.register_resource(
             type_string=cls.type_string(),
