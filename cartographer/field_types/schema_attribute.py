@@ -117,8 +117,7 @@ class SchemaAttribute(object):
         """
         return value
 
-    @classmethod
-    def from_json(cls, serialized_value):
+    def from_json(self, serialized_value):
         """
         :param serialized_value: The value to be parsed, as pulled directly from RequestInterface.get_json(force=True)
         :return: The parsed value, which can be dropped into a Python dictionary as the output of this Parser,
