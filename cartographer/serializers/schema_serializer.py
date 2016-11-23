@@ -150,15 +150,18 @@ class SchemaSerializer(JSONAPISerializer):
         return [include.split('.')[0]
                 for include in self.includes]
 
-    def should_include_relationship(self, key):
+    def should_include_relationship(self, key, check_mask=True):
         """
         Checks if the user requested the related resource and our Masks allow it.
 
         :param key: The name by which the parent resource refers to the child resource
+        :param check_mask: Whether or not this should check permissions when evaluating
         :return: A boolean indicating whether or not the relationship matching the given key should be serialized
         """
         if key not in self.normalized_includes():
             return False
+        if not check_mask:
+            return True
         if self._masked_includes is None:
             self._masked_includes = self.mask_class().includes_cant_view(self.model, self.current_user_id)
         return key not in self._masked_includes
@@ -180,9 +183,10 @@ class SchemaSerializer(JSONAPISerializer):
         relationship_keys = self.schema().relationships()
         if relationship_keys:
             for key in relationship_keys:
-                # Often times checking should_include_relationship issues a query,
-                # but priming is cheap, so we over-prime rather than check self.should_include_relationship(key)
-                self.prime_schema_relationship(key)
+                # Don't check permissions when deciding whether or not to prime,
+                # as that permission check can be expensive, while priming is typically cheap
+                if self.should_include_relationship(key, check_mask=False):
+                    self.prime_schema_relationship(key)
 
     def prime_schema_relationship(self, key):
         relationship_data_schema = self.schema().relationship(key)
@@ -216,11 +220,12 @@ class SchemaSerializer(JSONAPISerializer):
                     result[key] = attribute.to_json(self)
         return result
 
-    def should_include_attribute(self, key):
+    def should_include_attribute(self, key, check_mask=True):
         """
         Checks if the user requested the attribute and our Masks allow it.
 
         :param key: The name of the attribute of the resource
+        :param check_mask: Whether or not this should check permissions when evaluating
         :return: A boolean indicating whether or not the attribute matching the given key should be serialized
         """
         if self.requested_fields is not None and self.resource_type() in self.requested_fields:
@@ -228,6 +233,8 @@ class SchemaSerializer(JSONAPISerializer):
                 return False
         elif key not in self.default_fields():
             return False
+        if not check_mask:
+            return True
         if self._masked_fields is None:
             self._masked_fields = self.mask_class().fields_cant_view(self.model, self.current_user_id)
         return key not in self._masked_fields
