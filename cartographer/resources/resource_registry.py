@@ -20,6 +20,7 @@ class ResourceRegistry(object):
         self.registry = defaultdict(dict)
         self.initialization_hook = None
         self.hook_called = False
+        self.serializers = {}
 
     def set_initialization_hook(self, hook=None):
         self.initialization_hook = hook
@@ -32,6 +33,9 @@ class ResourceRegistry(object):
     def register_resource(self, type_string, schema,
                           serializer=None, parser=None, mask=None,
                           model=None, model_get=None, model_prime=None,):
+        if model and serializer:
+            self.serializers[model] = serializer
+
         self.registry[type_string].update(filter_dict({
             ResourceRegistryKeys.TYPE: type_string,
             ResourceRegistryKeys.SCHEMA: schema,
@@ -42,3 +46,6 @@ class ResourceRegistry(object):
             ResourceRegistryKeys.MODEL_GET: model_get,
             ResourceRegistryKeys.MODEL_PRIME: model_prime
         }))
+
+    def get_serializer_for_model(self, model):
+        return self.serializers.get(type(model), self.serializers.get(model))
