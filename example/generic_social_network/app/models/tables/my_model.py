@@ -1,5 +1,5 @@
 import generic_social_network
-from flask.ext.sqlalchemy import Model
+from flask_sqlalchemy import Model
 from sqlalchemy import inspect
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.expression import Insert

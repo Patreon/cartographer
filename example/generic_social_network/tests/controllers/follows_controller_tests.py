@@ -76,7 +76,7 @@ class FollowsControllerTestCase(ControllerTestCase):
         response = self.app.get('/follows/nonce/nonce2')
         self.check_response(response, 404,
                             {
-                                'error': 'The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.'})
+                                'error': 'The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.'})
 
         # also 404's when the users exist, but there's no follow
         follower_id, followed_id = 1, 2
@@ -86,7 +86,7 @@ class FollowsControllerTestCase(ControllerTestCase):
         response = self.app.get('/follows/follower/nonce')
         self.check_response(response, 404,
                             {
-                                'error': 'The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.'})
+                                'error': 'The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.'})
 
     def test_create_valid_follow(self):
         follower_id, followed_id = 1, 2
@@ -104,12 +104,12 @@ class FollowsControllerTestCase(ControllerTestCase):
         create_response = self.app.post('/follows/nonce/{0}'.format(user_id))
         self.check_response(create_response, 404,
                             {
-                                'error': 'The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.'})
+                                'error': 'The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.'})
         # followed doesn't exist
         create_response = self.app.post('/follows/{0}/nonce'.format(user_id))
         self.check_response(create_response, 404,
                             {
-                                'error': 'The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.'})
+                                'error': 'The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.'})
 
     def test_create_duplicate_follow(self):
         follower_id, followed_id = 1, 2
@@ -132,7 +132,7 @@ class FollowsControllerTestCase(ControllerTestCase):
         response = self.app.get('/follows/{0}/{1}'.format(follower_id, followed_id))
         self.check_response(response, 404,
                             {
-                                'error': 'The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.'})
+                                'error': 'The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.'})
 
     def test_delete_nonexistant_follow(self):
         follower_id, followed_id = 1, 2
@@ -142,6 +142,6 @@ class FollowsControllerTestCase(ControllerTestCase):
         delete_response = self.app.delete('/follows/{0}/{1}'.format(follower_id, followed_id))
         self.check_response(delete_response, 404,
                             {
-                                'error': 'The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.'})
+                                'error': 'The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.'})
 
 suite = FollowsControllerTestCase.suite()
