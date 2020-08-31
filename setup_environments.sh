@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-virtualenv -p python3 venv
+
+python -mvenv venv
+venv/bin/pip install -r dev-requirements.txt
 
 cd example
-virtualenv -p python3 venv
+python -mvenv venv
+venv/bin/pip install -r requirements.txt

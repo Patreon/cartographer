@@ -1,0 +1,22 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/circleci-demo-python-django
+    docker:
+      - image: circleci/python:3.6.4  # primary container for the build job
+    steps:
+      - checkout
+      - restore_cache:  # ensure this step occurs *before* installing dependencies
+          key: deps-{{ checksum "requirements.txt" }}
+      - run:
+          name: Setup environments
+          command: ./setup_environments.sh
+      - run:
+          name: Run tests
+          command: ./run_tests.sh
+
+      - save_cache:
+          key: deps-{{ checksum "requirements.txt" }}
+          paths:
+            - "venv"
+            - "example/venv"
