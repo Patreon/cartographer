@@ -27,5 +27,5 @@ def json_error_description(error_):
     return make_response(jsonify({'error': error_.description}), error_.code)
 
 
-for error in list(range(400, 420)) + list(range(500, 506)):
-    my_app.error_handler_spec[None][error] = json_error_description
+for error in [400, 401, 404, 405, 406, 409, 500]:
+    my_app.register_error_handler(error, json_error_description)

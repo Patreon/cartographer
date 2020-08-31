@@ -12,15 +12,7 @@ def connect(app):
     from generic_social_network.app.models.tables.my_model import MyModel
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + _db_file_location()
-
-    class MySQLAlchemy(SQLAlchemy):
-        def make_declarative_base(self):
-            from flask.ext.sqlalchemy import _BoundDeclarativeMeta, _QueryProperty
-            base = declarative_base(cls=MyModel, name='MyModel', metaclass=_BoundDeclarativeMeta)
-            base.query = _QueryProperty(self)
-            return base
-
-    db = MySQLAlchemy(app)
+    db = SQLAlchemy(app=app, model_class=declarative_base(cls=MyModel, name='MyModel'))
     # db.engine.echo = True
     return db
 

@@ -65,7 +65,7 @@ class PostsControllerTestCase(ControllerTestCase):
         response = self.app.get('/posts/999')
         self.check_response(response, 404,
                             {
-                                'error': 'The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.'})
+                                'error': 'The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.'})
 
     def test_create_valid_post(self):
         author_id = 1
@@ -138,13 +138,13 @@ class PostsControllerTestCase(ControllerTestCase):
         response = self.app.get('/posts/{0}'.format(post_id))
         self.check_response(response, 404,
                             {
-                                'error': 'The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.'})
+                                'error': 'The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.'})
 
     def test_delete_nonexistant_post(self):
         response = self.app.delete('/posts/999')
         self.check_response(response, 404,
                             {
-                                'error': 'The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.'})
+                                'error': 'The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.'})
 
     def test_update_post(self):
         author_id = 1
@@ -195,7 +195,7 @@ class PostsControllerTestCase(ControllerTestCase):
                                 content_type='application/json')
         self.check_response(response, 404,
                             {
-                                'error': 'The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.'})
+                                'error': 'The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.'})
 
 
 suite = PostsControllerTestCase.suite()
