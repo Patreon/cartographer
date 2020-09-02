@@ -10,7 +10,7 @@ setup(name='cartographer',
       packages=find_packages(exclude=['example', 'example.*', 'test', 'test.*']),
       install_requires=[
           'python-dateutil>=2.4.2',
-          'ciso8601>=1.0.1'
+          'ciso8601>=2,<3'
       ],
       zip_safe=True,
       classifiers=[

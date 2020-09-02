@@ -18,7 +18,6 @@ class DateAttribute(SchemaAttribute):
         try:
             # ciso8601 is significantly faster than dateutil.parser for parsing iso8601 strings, so we try it first
             parsed_value = ciso8601.parse_datetime(serialized_value)
-            assert parsed_value is not None  # Caveat: asserts won't run if python is run with -O.
         except Exception as e:
             parsed_value = dateutil.parser.parse(serialized_value)
 
