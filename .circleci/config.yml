@@ -1,4 +1,6 @@
-version: 2
+version: 2.1
+orbs:
+  codecov: codecov/codecov@3.2.4
 jobs:
   build:
     working_directory: ~/circleci-demo-python-django
@@ -20,3 +22,9 @@ jobs:
           paths:
             - "venv"
             - "example/venv"
+  upload-to-codecov:
+    jobs:
+      - checkout
+      - codecov/upload:
+        file: './coverage/clover.xml'
+        token: a7a5df63-codcov-token-4278vh38
